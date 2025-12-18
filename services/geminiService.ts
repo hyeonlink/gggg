@@ -1,10 +1,9 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
 /**
  * 프로젝트 내용과 후원자 데이터를 분석하여 가장 적합한 엔젤 후원자들을 매칭합니다.
+ * 가이드라인에 따라 호출 직전에 인스턴스를 생성합니다.
  */
 export const matchSponsorsAI = async (projectDetails: {
   clubName: string;
@@ -12,6 +11,9 @@ export const matchSponsorsAI = async (projectDetails: {
   description: string;
 }, sponsorsData: any[]) => {
   const { clubName, projectTitle, description } = projectDetails;
+  
+  // 가이드라인: 호출 직전에 인스턴스 생성
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const systemPrompt = `You are an elite matching AI for university club sponsorship.
   Your goal is to analyze a club's project and find the best 'Angel' sponsors from a provided list.
@@ -50,10 +52,11 @@ export const matchSponsorsAI = async (projectDetails: {
 };
 
 /**
- * 기존의 AI 메시지 생성 기능은 사용자가 직접 작성하는 방식으로 변경됨에 따라 제거하거나 
- * 보조적인 역할로만 남겨둘 수 있으나, 요청에 따라 전송 자동화 로직에 집중합니다.
+ * 사용자 쿼리에 기반하여 동아리를 검색합니다.
  */
 export const searchClubsAI = async (query: string, clubsData: any[]) => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
   const prompt = `
     Based on the following user query: "${query}"
     And the club data provided: ${JSON.stringify(clubsData.map(c => ({ id: c.id, name: c.name, description: c.description, tags: c.tags })))}
