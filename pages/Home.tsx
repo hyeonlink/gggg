@@ -4,7 +4,7 @@ import { MOCK_FEED_POSTS, MOCK_CLUBS } from '../constants.tsx';
 
 const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }) => {
   return (
-    <div className="min-h-screen bg-[#000000] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#000000] text-white overflow-x-hidden font-sans">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
@@ -16,7 +16,7 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                   <div className="w-20 h-20 rounded-sm border-2 border-[#111] bg-neutral-800 mx-auto overflow-hidden mb-4 shadow-xl">
                     <img src="https://picsum.photos/seed/me/100/100" className="w-full h-full object-cover grayscale" alt="Profile" />
                   </div>
-                  <h3 className="font-black tracking-tighter text-xl uppercase truncate">김양현</h3>
+                  <h3 className="font-black tracking-tighter text-xl uppercase truncate px-2">김양현</h3>
                   <p className="text-[10px] text-white/40 tracking-widest font-bold uppercase mt-1">Angel Investor</p>
                </div>
                <div className="border-t border-white/5 p-4 space-y-3">
@@ -29,14 +29,6 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                     <span className="text-white">5</span>
                   </div>
                </div>
-            </div>
-
-            <div className="bg-[#111] border border-white/10 p-6 rounded-sm">
-               <h4 className="text-[11px] font-black tracking-widest text-white uppercase mb-4">Quick Links</h4>
-               <ul className="space-y-4 text-xs font-bold text-white/40 tracking-widest">
-                 <li className="flex items-center gap-3 hover:text-white cursor-pointer transition-colors"><i className="fa-solid fa-users w-4"></i> 내 그룹</li>
-                 <li className="flex items-center gap-3 hover:text-white cursor-pointer transition-colors"><i className="fa-solid fa-calendar-days w-4"></i> 캠퍼스 이벤트</li>
-               </ul>
             </div>
           </div>
 
@@ -59,7 +51,7 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                 <div key={post.id} className="bg-[#111] border border-white/10 rounded-sm overflow-hidden flex flex-col shadow-2xl">
                   {/* Post Header */}
                   <div className="p-4 md:p-6 flex justify-between items-start">
-                    <div className="flex gap-3 md:gap-4 cursor-pointer group min-w-0" onClick={() => onSelectClub(post.clubId)}>
+                    <div className="flex gap-3 md:gap-4 cursor-pointer group min-w-0 flex-grow" onClick={() => onSelectClub(post.clubId)}>
                        <div className="w-10 h-10 md:w-12 md:h-12 bg-neutral-800 border border-white/10 shrink-0">
                           <img src={post.clubLogo} alt={post.clubName} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
                        </div>
@@ -94,26 +86,26 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                      <span className="hidden xs:inline">조회 1.2K</span>
                   </div>
 
-                  {/* Action Buttons: Redesigned to be unbreakable on narrow screens */}
+                  {/* Action Buttons: Unbreakable grid */}
                   <div className="grid grid-cols-4 bg-white/[0.01]">
-                     <button className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 hover:bg-white/5 text-[10px] md:text-[11px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5 min-w-0">
-                        <i className="fa-regular fa-thumbs-up text-base"></i>
+                     <button className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 hover:bg-white/5 text-[10px] md:text-[11px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5 min-w-0 overflow-hidden">
+                        <i className="fa-regular fa-thumbs-up text-base flex-shrink-0"></i>
                         <span className="hidden sm:inline-block truncate">좋아요</span>
                      </button>
-                     <button className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 hover:bg-white/5 text-[10px] md:text-[11px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5 min-w-0">
-                        <i className="fa-regular fa-comment text-base"></i>
+                     <button className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 hover:bg-white/5 text-[10px] md:text-[11px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5 min-w-0 overflow-hidden">
+                        <i className="fa-regular fa-comment text-base flex-shrink-0"></i>
                         <span className="hidden sm:inline-block truncate">댓글</span>
                      </button>
-                     <button className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 hover:bg-white/5 text-[10px] md:text-[11px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5 min-w-0">
-                        <i className="fa-solid fa-share-nodes text-base"></i>
+                     <button className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 hover:bg-white/5 text-[10px] md:text-[11px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5 min-w-0 overflow-hidden">
+                        <i className="fa-solid fa-share-nodes text-base flex-shrink-0"></i>
                         <span className="hidden sm:inline-block truncate">공유</span>
                      </button>
                      {post.projectId ? (
                        <button 
                          onClick={() => onSelectClub(post.clubId)}
-                         className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 bg-white text-black text-[10px] md:text-[11px] font-black tracking-widest uppercase hover:bg-neutral-200 transition-all min-w-0"
+                         className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 bg-white text-black text-[10px] md:text-[11px] font-black tracking-widest uppercase hover:bg-neutral-200 transition-all min-w-0 overflow-hidden"
                        >
-                          <i className="fa-solid fa-heart text-base"></i>
+                          <i className="fa-solid fa-heart text-base flex-shrink-0"></i>
                           <span className="hidden sm:inline-block truncate">후원</span>
                        </button>
                      ) : (
@@ -147,10 +139,6 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                    </div>
                  ))}
                </div>
-            </div>
-
-            <div className="text-[9px] text-white/20 tracking-widest uppercase font-bold leading-relaxed px-2">
-              Angel Campus © 2024
             </div>
           </div>
         </div>
