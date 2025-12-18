@@ -1,0 +1,8 @@
+{
+  "name": "Angel Campus (엔젤캠퍼스)",
+  "description": "A high-end platform connecting university clubs with 'Angel' sponsors, featuring professional branding, AI-driven outreach, and transparent project funding.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
