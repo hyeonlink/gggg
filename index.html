@@ -7,7 +7,21 @@
     <title>Angel Campus | 엔젤캠퍼스</title>
     <!-- Favicon fix to prevent 404 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👼</text></svg>">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    
+    <!-- CRITICAL: line-clamp is built-in since v3.3. Do NOT include it in the plugins list. -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            screens: {
+              'xs': '400px',
+            }
+          }
+        }
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
@@ -19,7 +33,9 @@
             color: #ffffff;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
+        /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -33,13 +49,9 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
-        /* Smooth transitions for navigation */
-        .page-transition-enter {
-            opacity: 0;
-        }
-        .page-transition-enter-active {
-            opacity: 1;
-            transition: opacity 300ms ease-in;
+        /* Prevent layout shift on image load */
+        img {
+            content-visibility: auto;
         }
     </style>
 <script type="importmap">

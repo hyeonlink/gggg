@@ -1,5 +1,5 @@
 
-import { Club, CommunityPost, Sponsor, FeedPost } from './types';
+import { Club, CommunityPost, Sponsor, FeedPost } from './types.ts';
 
 export const MOCK_CLUBS: Club[] = [
   {

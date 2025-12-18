@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { matchSponsorsAI } from '../services/geminiService';
-import { MOCK_SPONSORS } from '../constants';
-import { Sponsor } from '../types';
+import { matchSponsorsAI } from '../services/geminiService.ts';
+import { MOCK_SPONSORS } from '../constants.tsx';
+import { Sponsor } from '../types.ts';
 
 const AIAssistant: React.FC = () => {
   const [loading, setLoading] = useState(false);

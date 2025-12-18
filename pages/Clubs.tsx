@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { MOCK_CLUBS } from '../constants';
-import { searchClubsAI } from '../services/geminiService';
-import { Club } from '../types';
+import { MOCK_CLUBS } from '../constants.tsx';
+import { searchClubsAI } from '../services/geminiService.ts';
+import { Club } from '../types.ts';
 
 const Clubs: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }) => {
   const [searchQuery, setSearchQuery] = useState('');

@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react';
-import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Clubs from './pages/Clubs';
-import ClubProfile from './pages/ClubProfile';
-import Community from './pages/Community';
-import AIAssistant from './pages/AIAssistant';
-import Ranking from './pages/Ranking';
-import Sponsors from './pages/Sponsors';
-import { MOCK_CLUBS } from './constants';
+import Navbar from './components/Navbar.tsx';
+import Home from './pages/Home.tsx';
+import Clubs from './pages/Clubs.tsx';
+import ClubProfile from './pages/ClubProfile.tsx';
+import Community from './pages/Community.tsx';
+import AIAssistant from './pages/AIAssistant.tsx';
+import Ranking from './pages/Ranking.tsx';
+import Sponsors from './pages/Sponsors.tsx';
+import { MOCK_CLUBS } from './constants.tsx';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('HOME');
