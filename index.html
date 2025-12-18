@@ -8,7 +8,7 @@
     <!-- Favicon fix to prevent 404 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👼</text></svg>">
     
-    <!-- line-clamp is built-in since v3.3. Do NOT include it in the plugins list to avoid console warnings. -->
+    <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     
     <script>
@@ -66,5 +66,7 @@
 </head>
 <body>
     <div id="root"></div>
+    <!-- 엔트리 포인트 스크립트 추가: 이 태그가 있어야 앱이 실행됩니다. -->
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>
