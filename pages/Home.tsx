@@ -8,16 +8,16 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Sidebar: Profile Summary (Hidden on Mobile) */}
+          {/* Left Sidebar: Profile Summary */}
           <div className="hidden lg:block lg:col-span-3 space-y-6 sticky top-28">
             <div className="bg-[#111] border border-white/10 overflow-hidden rounded-sm">
-               <div className="h-20 bg-gradient-to-r from-neutral-800 to-neutral-900"></div>
+               <div className="h-20 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
                <div className="p-6 -mt-12 text-center">
                   <div className="w-20 h-20 rounded-sm border-2 border-[#111] bg-neutral-800 mx-auto overflow-hidden mb-4 shadow-xl">
-                    <img src="https://picsum.photos/seed/me/100/100" className="w-full h-full object-cover grayscale" alt="Profile" />
+                    <img src="https://picsum.photos/seed/me/100/100" className="w-full h-full object-cover" alt="Profile" />
                   </div>
                   <h3 className="font-black tracking-tighter text-xl uppercase truncate px-2">김양현</h3>
-                  <p className="text-[10px] text-white/40 tracking-widest font-bold uppercase mt-1">Angel Investor</p>
+                  <p className="text-[10px] text-blue-400 tracking-widest font-bold uppercase mt-1">Angel Investor</p>
                </div>
                <div className="border-t border-white/5 p-4 space-y-3">
                   <div className="flex justify-between text-[11px] font-bold tracking-widest text-white/40">
@@ -38,7 +38,7 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
             {/* Post Input Field */}
             <div className="bg-[#111] border border-white/10 p-4 flex gap-4 rounded-sm shadow-lg overflow-hidden">
                <div className="w-10 h-10 md:w-12 md:h-12 bg-neutral-800 shrink-0 border border-white/5 rounded-sm overflow-hidden">
-                  <img src="https://picsum.photos/seed/me/100/100" className="w-full h-full object-cover grayscale" alt="Avatar" />
+                  <img src="https://picsum.photos/seed/me/100/100" className="w-full h-full object-cover" alt="Avatar" />
                </div>
                <button className="flex-grow text-left px-4 border border-white/10 text-white/30 text-xs font-light hover:bg-white/5 transition-colors truncate">
                   업데이트를 공유하세요...
@@ -53,10 +53,10 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                   <div className="p-4 md:p-6 flex justify-between items-start">
                     <div className="flex gap-3 md:gap-4 cursor-pointer group min-w-0 flex-grow" onClick={() => onSelectClub(post.clubId)}>
                        <div className="w-10 h-10 md:w-12 md:h-12 bg-neutral-800 border border-white/10 shrink-0">
-                          <img src={post.clubLogo} alt={post.clubName} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                          <img src={post.clubLogo} alt={post.clubName} className="w-full h-full object-cover group-hover:opacity-80 transition-all" />
                        </div>
                        <div className="min-w-0 flex-grow">
-                          <h4 className="font-black tracking-tighter text-sm md:text-lg uppercase leading-tight group-hover:text-white transition-colors truncate">{post.clubName}</h4>
+                          <h4 className="font-black tracking-tighter text-sm md:text-lg uppercase leading-tight group-hover:text-blue-400 transition-colors truncate">{post.clubName}</h4>
                           <div className="text-[9px] md:text-[10px] text-white/40 font-bold tracking-widest uppercase mt-0.5 truncate">
                             {post.university} • {post.createdAt}
                           </div>
@@ -73,20 +73,20 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                   {/* Post Image Container */}
                   {post.image && (
                     <div className="w-full bg-neutral-900 border-y border-white/5 overflow-hidden flex items-center justify-center min-h-[180px] md:min-h-[250px]">
-                       <img src={post.image} className="w-full h-auto max-h-[500px] object-contain grayscale hover:grayscale-0 transition-all duration-1000" alt="Post context" />
+                       <img src={post.image} className="w-full h-auto max-h-[500px] object-contain hover:scale-[1.02] transition-all duration-700" alt="Post context" />
                     </div>
                   )}
 
                   {/* Engagement Metrics */}
                   <div className="px-4 md:px-6 py-3 flex justify-between items-center text-[9px] md:text-[10px] text-white/30 font-bold tracking-widest uppercase border-b border-white/5">
                      <div className="flex gap-4">
-                        <span className="flex items-center gap-1"><i className="fa-solid fa-heart text-white/20"></i> {post.likes}</span>
-                        <span className="flex items-center gap-1"><i className="fa-solid fa-comment text-white/20"></i> {post.comments}</span>
+                        <span className="flex items-center gap-1"><i className="fa-solid fa-heart text-red-500/60"></i> {post.likes}</span>
+                        <span className="flex items-center gap-1"><i className="fa-solid fa-comment text-blue-500/60"></i> {post.comments}</span>
                      </div>
                      <span className="hidden xs:inline">조회 1.2K</span>
                   </div>
 
-                  {/* Action Buttons: Unbreakable grid */}
+                  {/* Action Buttons */}
                   <div className="grid grid-cols-4 bg-white/[0.01]">
                      <button className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 hover:bg-white/5 text-[10px] md:text-[11px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5 min-w-0 overflow-hidden">
                         <i className="fa-regular fa-thumbs-up text-base flex-shrink-0"></i>
@@ -103,7 +103,7 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                      {post.projectId ? (
                        <button 
                          onClick={() => onSelectClub(post.clubId)}
-                         className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 bg-white text-black text-[10px] md:text-[11px] font-black tracking-widest uppercase hover:bg-neutral-200 transition-all min-w-0 overflow-hidden"
+                         className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-3 bg-blue-600 text-white text-[10px] md:text-[11px] font-black tracking-widest uppercase hover:bg-blue-500 transition-all min-w-0 overflow-hidden"
                        >
                           <i className="fa-solid fa-heart text-base flex-shrink-0"></i>
                           <span className="hidden sm:inline-block truncate">후원</span>
@@ -119,7 +119,7 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
             </div>
           </div>
 
-          {/* Right Sidebar: Recommendations (Hidden on Mobile) */}
+          {/* Right Sidebar: Recommendations */}
           <div className="hidden lg:block lg:col-span-3 space-y-6 sticky top-28">
             <div className="bg-[#111] border border-white/10 p-6 rounded-sm">
                <div className="flex justify-between items-center mb-6">
@@ -130,10 +130,10 @@ const Home: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }
                  {MOCK_CLUBS.slice(0, 3).map(club => (
                    <div key={club.id} className="flex gap-4 items-center group cursor-pointer" onClick={() => onSelectClub(club.id)}>
                       <div className="w-10 h-10 bg-neutral-800 border border-white/10 shrink-0 overflow-hidden">
-                         <img src={club.logo} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" alt={club.name} />
+                         <img src={club.logo} className="w-full h-full object-cover group-hover:scale-110 transition-all" alt={club.name} />
                       </div>
                       <div className="min-w-0">
-                         <div className="text-xs font-black tracking-tight uppercase truncate">{club.name}</div>
+                         <div className="text-xs font-black tracking-tight uppercase truncate group-hover:text-blue-400">{club.name}</div>
                          <div className="text-[9px] text-white/30 tracking-widest uppercase truncate">{club.category}</div>
                       </div>
                    </div>

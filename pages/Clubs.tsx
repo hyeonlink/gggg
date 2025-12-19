@@ -46,16 +46,16 @@ const Clubs: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="AI에게 물어보세요 (예: 보안에 관심 있는 서울대 동아리 알려줘)"
-                className="w-full bg-neutral-900 border border-white/20 p-5 pl-8 text-white focus:outline-none focus:border-white transition-all text-xl font-light placeholder:text-white/20"
+                className="w-full bg-neutral-900 border border-white/20 p-5 pl-8 text-white focus:outline-none focus:border-blue-500 transition-all text-xl font-light placeholder:text-white/20"
               />
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 text-white/20 italic text-sm pointer-events-none group-focus-within:hidden">
+              <div className="absolute right-6 top-1/2 -translate-y-1/2 text-blue-400/50 italic text-sm pointer-events-none group-focus-within:hidden">
                 Powered by Gemini AI
               </div>
             </div>
             <button 
               onClick={handleAISearch}
               disabled={isSearching}
-              className="bg-white text-black px-12 py-5 font-black tracking-widest hover:bg-neutral-200 transition-all disabled:opacity-50 min-w-[200px]"
+              className="bg-blue-600 text-white px-12 py-5 font-black tracking-widest hover:bg-blue-500 transition-all disabled:opacity-50 min-w-[200px]"
             >
               {isSearching ? '검색 중...' : 'AI 스마트 검색'}
             </button>
@@ -64,7 +64,7 @@ const Clubs: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub 
           {/* Categories */}
           <div className="flex flex-wrap gap-4 text-xs tracking-[0.3em] font-black uppercase mb-16">
             {['전체', 'IT/코딩', '음악/공연', '스포츠', '예술/디자인', '문화/봉사'].map((cat) => (
-              <button key={cat} className="px-8 py-3 border border-white/10 hover:border-white hover:bg-white hover:text-black transition-all">
+              <button key={cat} className="px-8 py-3 border border-white/10 hover:border-blue-500 hover:text-blue-400 transition-all">
                 {cat}
               </button>
             ))}
@@ -83,16 +83,16 @@ const Clubs: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub 
                 <img 
                   src={club.logo} 
                   alt={club.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale group-hover:grayscale-0"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                   <span className="text-white font-black tracking-widest border border-white px-4 py-2 text-xs">VIEW BRAND</span>
+                <div className="absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                   <span className="text-white font-black tracking-widest border border-white px-4 py-2 text-xs backdrop-blur-sm">VIEW BRAND</span>
                 </div>
               </div>
               <div className="flex flex-col">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-2xl font-black tracking-tighter uppercase leading-tight">{club.name}</h3>
-                  <span className="text-[10px] border border-white/20 px-2 py-0.5 tracking-tighter font-bold uppercase shrink-0 mt-1">
+                  <h3 className="text-2xl font-black tracking-tighter uppercase leading-tight group-hover:text-blue-400 transition-colors">{club.name}</h3>
+                  <span className="text-[10px] border border-blue-500/40 text-blue-400 px-2 py-0.5 tracking-tighter font-bold uppercase shrink-0 mt-1">
                     {club.category}
                   </span>
                 </div>

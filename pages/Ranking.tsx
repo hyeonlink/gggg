@@ -26,7 +26,7 @@ const Ranking: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClu
               key={univ}
               onClick={() => setFilter(univ)}
               className={`text-xs font-black tracking-widest px-4 py-2 transition-all ${
-                filter === univ ? 'text-white border-b-2 border-white' : 'text-white/30 hover:text-white'
+                filter === univ ? 'text-blue-500 border-b-2 border-blue-500' : 'text-white/30 hover:text-white'
               }`}
             >
               {univ === 'ALL' ? '전체 학교' : univ}
@@ -40,17 +40,17 @@ const Ranking: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClu
             <div 
               key={club.id}
               onClick={() => onSelectClub(club.id)}
-              className="group flex flex-col md:flex-row items-center bg-[#0f0f0f] border border-white/5 p-6 hover:border-white/30 transition-all cursor-pointer"
+              className="group flex flex-col md:flex-row items-center bg-[#0f0f0f] border border-white/5 p-6 hover:border-blue-500/30 transition-all cursor-pointer"
             >
               <div className="flex items-center gap-10 flex-grow w-full">
-                <div className="text-4xl font-black italic text-white/20 w-12 text-center group-hover:text-white transition-colors">
+                <div className={`text-4xl font-black italic w-12 text-center transition-colors ${index < 3 ? 'text-blue-500' : 'text-white/20'}`}>
                   {String(index + 1).padStart(2, '0')}
                 </div>
-                <div className="w-16 h-16 bg-neutral-800 border border-white/10 shrink-0">
-                   <img src={club.logo} alt={club.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" />
+                <div className="w-16 h-16 bg-neutral-800 border border-white/10 shrink-0 overflow-hidden">
+                   <img src={club.logo} alt={club.name} className="w-full h-full object-cover group-hover:scale-110 transition-all" />
                 </div>
                 <div className="flex-grow">
-                   <div className="text-xl font-black tracking-tighter uppercase">{club.name}</div>
+                   <div className="text-xl font-black tracking-tighter uppercase group-hover:text-blue-400 transition-colors">{club.name}</div>
                    <div className="text-[10px] text-white/40 tracking-widest font-bold uppercase">{club.university} • {club.category}</div>
                 </div>
               </div>
@@ -61,11 +61,11 @@ const Ranking: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClu
                    <div className="text-lg font-mono text-white/80">₩{club.totalFunding.toLocaleString()}</div>
                 </div>
                 <div className="text-right min-w-[100px]">
-                   <div className="text-[10px] text-white/20 tracking-widest uppercase mb-1">엔젤 스코어</div>
-                   <div className="text-3xl font-black italic text-white">{club.angelScore}</div>
+                   <div className="text-[10px] text-blue-500/50 tracking-widest uppercase mb-1 font-black">엔젤 스코어</div>
+                   <div className="text-3xl font-black italic text-white group-hover:text-blue-400 transition-colors">{club.angelScore}</div>
                 </div>
                 <div className="hidden md:block">
-                   <i className="fa-solid fa-chevron-right text-white/20 group-hover:translate-x-2 transition-transform"></i>
+                   <i className="fa-solid fa-chevron-right text-white/20 group-hover:translate-x-2 group-hover:text-blue-500 transition-all"></i>
                 </div>
               </div>
             </div>
