@@ -12,7 +12,6 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
     { id: 'CLUBS', label: '동아리 탐색' },
     { id: 'RANKING', label: '랭킹' },
     { id: 'SPONSORS', label: '엔젤(후원자)' },
-    { id: 'COMMUNITY', label: '커뮤니티' },
     { id: 'AI_LAB', label: 'AI 홍보실' },
   ];
 
@@ -23,7 +22,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
         onClick={() => onNavigate('HOME')}
       >
         <span className="text-white">ANGEL</span>
-        <span className="text-white/50 font-light italic">CAMPUS</span>
+        <span className="text-blue-600 font-black italic">CAMPUS</span>
       </div>
       
       <div className="hidden lg:flex gap-10 items-center">
@@ -41,7 +40,18 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentPage }) => {
       </div>
 
       <div className="flex gap-4 items-center">
-        <button className="text-sm font-bold border border-white px-5 py-1.5 hover:bg-white hover:text-black transition-all">
+        <button 
+          onClick={() => onNavigate('REGISTER_CLUB')}
+          className="hidden md:block text-[10px] font-black tracking-widest bg-blue-600 text-white px-5 py-2 hover:bg-blue-700 transition-all uppercase"
+        >
+          동아리 등록하기
+        </button>
+        <button 
+          onClick={() => onNavigate('AUTH')}
+          className={`text-sm font-bold border border-white px-5 py-1.5 transition-all ${
+            currentPage === 'AUTH' ? 'bg-white text-black' : 'hover:bg-white hover:text-black'
+          }`}
+        >
           로그인
         </button>
       </div>

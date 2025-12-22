@@ -1,18 +1,62 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar.tsx';
 import Home from './pages/Home.tsx';
 import Clubs from './pages/Clubs.tsx';
 import ClubProfile from './pages/ClubProfile.tsx';
-import Community from './pages/Community.tsx';
 import AIAssistant from './pages/AIAssistant.tsx';
 import Ranking from './pages/Ranking.tsx';
 import Sponsors from './pages/Sponsors.tsx';
-import { MOCK_CLUBS } from './constants.tsx';
+import ClubRegistration from './pages/ClubRegistration.tsx';
+import AdminLogin from './pages/AdminLogin.tsx';
+import AdminDashboard from './pages/AdminDashboard.tsx';
+import Auth from './pages/Auth.tsx';
+import { MOCK_CLUBS, MOCK_FEED_POSTS, MOCK_SPONSORS } from './constants.tsx';
+import { Club, FeedPost, Sponsor } from './types.ts';
+import { supabase } from './lib/supabase.ts';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('HOME');
   const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
+  
+  // States
+  const [clubs, setClubs] = useState<Club[]>(MOCK_CLUBS);
+  const [posts, setPosts] = useState<FeedPost[]>(MOCK_FEED_POSTS);
+  const [sponsors, setSponsors] = useState<Sponsor[]>(MOCK_SPONSORS);
+  const [pendingClubs, setPendingClubs] = useState<Club[]>([]);
+  
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Initialize and Fetch Data
+  useEffect(() => {
+    const initData = async () => {
+      setLoading(true);
+      try {
+        const { data: clubsData } = await supabase.from('clubs').select('*');
+        if (clubsData && clubsData.length > 0) setClubs(clubsData);
+
+        const { data: postsData } = await supabase.from('posts').select('*').order('created_at', { ascending: false });
+        if (postsData && postsData.length > 0) {
+          const formattedPosts = postsData.map(p => ({
+            ...p,
+            id: p.id.toString(),
+            clubId: p.club_id,
+            clubName: p.club_name,
+            clubLogo: p.club_logo,
+            createdAt: p.created_at ? new Date(p.created_at).toLocaleDateString() : '방금 전'
+          }));
+          setPosts(formattedPosts);
+        }
+      } catch (err) {
+        console.error("Data Sync Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initData();
+  }, []);
 
   const navigateTo = (page: string) => {
     setCurrentPage(page);
@@ -26,93 +70,94 @@ const App: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
+  const handleAddPost = async (newPostData: Omit<FeedPost, 'id' | 'createdAt' | 'likes' | 'comments'>) => {
+    try {
+      const { data, error } = await supabase.from('posts').insert([{
+        club_id: newPostData.clubId,
+        club_name: newPostData.clubName,
+        club_logo: newPostData.clubLogo,
+        university: newPostData.university,
+        content: newPostData.content,
+        image: newPostData.image,
+        type: newPostData.type,
+        likes: 0,
+        comments: 0
+      }]).select();
+      
+      if (error) throw error;
+
+      if (data && data[0]) {
+        const savedPost: FeedPost = {
+          ...newPostData,
+          id: data[0].id.toString(),
+          createdAt: '방금 전',
+          likes: 0,
+          comments: 0
+        };
+        setPosts(prev => [savedPost, ...prev]);
+      }
+    } catch (err) {
+      console.error("Post Sync Error:", err);
+      const tempPost: FeedPost = { ...newPostData, id: `temp-${Date.now()}`, createdAt: '방금 전', likes: 0, comments: 0 };
+      setPosts(prev => [tempPost, ...prev]);
+    }
+  };
+
   const renderPage = () => {
+    if (currentPage === 'ADMIN_DASHBOARD') {
+      if (!isAdminLoggedIn) return <AdminLogin onLogin={() => setIsAdminLoggedIn(true)} />;
+      return <AdminDashboard pendingClubs={pendingClubs} allSponsors={sponsors} onApprove={() => {}} onReject={() => {}} onLogout={() => setIsAdminLoggedIn(false)} />;
+    }
+
+    if (currentPage === 'AUTH') {
+      return <Auth onAuthSuccess={(isAdmin) => {
+        if (isAdmin) {
+          setIsAdminLoggedIn(true);
+          navigateTo('ADMIN_DASHBOARD');
+        } else {
+          navigateTo('HOME');
+        }
+      }} />;
+    }
+
     if (selectedClubId && currentPage === 'CLUB_PROFILE') {
-      const club = MOCK_CLUBS.find(c => c.id === selectedClubId);
-      if (club) return <ClubProfile club={club} />;
+      const club = clubs.find(c => c.id === selectedClubId);
+      if (club) return <ClubProfile club={club} onAddPost={handleAddPost} allPosts={posts} />;
     }
 
     switch (currentPage) {
       case 'HOME':
-        return <Home onSelectClub={selectClub} />;
+        return <Home onSelectClub={selectClub} customPosts={posts} />;
       case 'CLUBS':
-        return <Clubs onSelectClub={selectClub} />;
+        return <Clubs onSelectClub={selectClub} customClubs={clubs} />;
       case 'RANKING':
         return <Ranking onSelectClub={selectClub} />;
       case 'SPONSORS':
-        return <Sponsors />;
-      case 'COMMUNITY':
-        return <Community />;
+        return <Sponsors customSponsors={sponsors} />;
       case 'AI_LAB':
         return <AIAssistant />;
+      case 'REGISTER_CLUB':
+        return <ClubRegistration onRegister={() => {}} />;
       default:
-        return <Home onSelectClub={selectClub} />;
+        return <Home onSelectClub={selectClub} customPosts={posts} />;
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-white selection:text-black bg-black">
-      <Navbar onNavigate={navigateTo} currentPage={currentPage} />
+      {currentPage !== 'ADMIN_DASHBOARD' && (
+        <Navbar onNavigate={navigateTo} currentPage={currentPage} />
+      )}
       <main className="flex-grow">
-        {renderPage()}
+        {loading && currentPage === 'HOME' ? (
+          <div className="h-screen flex items-center justify-center bg-black">
+             <div className="flex flex-col items-center gap-6">
+                <div className="w-10 h-10 border-2 border-white/10 border-t-white rounded-full animate-spin"></div>
+                <div className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase">Syncing Data...</div>
+             </div>
+          </div>
+        ) : renderPage()}
       </main>
-      
-      {/* Mobile Sticky CTA */}
-      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-40">
-        <button 
-          onClick={() => navigateTo('CLUBS')}
-          className="bg-white text-black px-12 py-4 rounded-sm font-black tracking-[0.2em] text-xs shadow-[0_10px_30px_rgba(255,255,255,0.3)] active:scale-95 transition-all uppercase"
-        >
-          EXPLORE CAMPUS
-        </button>
-      </div>
-
-      <footer className="bg-black py-24 px-6 md:px-24 border-t border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-16 mb-20">
-            <div className="space-y-6 max-w-sm">
-              <div className="text-3xl font-black tracking-tighter">ANGEL CAMPUS</div>
-              <p className="text-sm text-white/40 leading-relaxed font-light">
-                대한민국 엘리트 대학 동아리를 위한 전문 브랜딩 및 엔젤 투자 매칭 플랫폼. 
-                우리는 캠퍼스의 열정이 세상을 바꾸는 유산이 될 수 있도록 돕습니다.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-16">
-              <div className="space-y-4">
-                <div className="text-[10px] font-black tracking-widest text-white uppercase">Platform</div>
-                <div className="flex flex-col gap-2 text-xs text-white/40 font-bold">
-                  <button onClick={() => navigateTo('CLUBS')} className="text-left hover:text-white transition-colors">동아리 탐색</button>
-                  <button onClick={() => navigateTo('RANKING')} className="text-left hover:text-white transition-colors">랭킹</button>
-                  <button onClick={() => navigateTo('COMMUNITY')} className="text-left hover:text-white transition-colors">커뮤니티</button>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="text-[10px] font-black tracking-widest text-white uppercase">Network</div>
-                <div className="flex flex-col gap-2 text-xs text-white/40 font-bold">
-                  <button onClick={() => navigateTo('SPONSORS')} className="text-left hover:text-white transition-colors">엔젤(후원자)</button>
-                  <button className="text-left hover:text-white transition-colors">기업 파트너십</button>
-                  <button onClick={() => navigateTo('AI_LAB')} className="text-left hover:text-white transition-colors">AI 홍보실</button>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="text-[10px] font-black tracking-widest text-white uppercase">Follow Us</div>
-                <div className="flex gap-6 text-xl">
-                  <i className="fa-brands fa-instagram text-white/40 hover:text-white cursor-pointer transition-colors"></i>
-                  <i className="fa-brands fa-linkedin text-white/40 hover:text-white cursor-pointer transition-colors"></i>
-                  <i className="fa-brands fa-x-twitter text-white/40 hover:text-white cursor-pointer transition-colors"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[9px] tracking-[0.3em] uppercase text-white/20 font-black">
-            <span>© 2024 ANGEL CAMPUS. ALL RIGHTS RESERVED.</span>
-            <div className="flex gap-8">
-              <button className="hover:text-white transition-colors">Privacy Policy</button>
-              <button className="hover:text-white transition-colors">Terms of Service</button>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

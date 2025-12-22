@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { MOCK_POSTS } from '../constants';
+// Fix: added .tsx extension for correct module resolution and ensured MOCK_POSTS is exported in constants.tsx
+import { MOCK_POSTS } from '../constants.tsx';
 
 const Community: React.FC = () => {
   return (

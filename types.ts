@@ -16,6 +16,12 @@ export interface Club {
   projects: Project[];
   angelScore: number;
   totalFunding: number;
+  // New verification fields
+  activityHistory?: string;
+  activityHistoryImage?: string;
+  adminRole?: string;
+  adminProofUrl?: string;
+  verificationStatus?: 'PENDING' | 'VERIFIED' | 'REJECTED';
 }
 
 export interface Project {
@@ -59,16 +65,16 @@ export interface FeedPost {
   projectId?: string; // 연결된 프로젝트가 있을 경우
 }
 
-export interface CommunityPost {
+// Add Post interface for the Community page
+export interface Post {
   id: string;
-  author: string;
-  authorRole: UserRole;
   title: string;
-  content: string;
-  createdAt: string;
+  author: string;
+  authorRole: 'ANGEL' | 'CLUB';
   views: number;
   likes: number;
   comments: number;
+  createdAt: string;
 }
 
 export interface Sponsor {

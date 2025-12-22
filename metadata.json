@@ -1,6 +1,6 @@
 {
   "name": "Angel Campus (엔젤캠퍼스)",
-  "description": "A high-end platform connecting university clubs with 'Angel' sponsors, featuring professional branding, AI-driven outreach, and transparent project funding.",
+  "description": "대한민국 No.1 대학 동아리 브랜딩 및 엔젤 투자 매칭 플랫폼",
   "requestFramePermissions": [
     "camera",
     "microphone"

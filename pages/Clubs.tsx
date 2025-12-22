@@ -4,20 +4,30 @@ import { MOCK_CLUBS } from '../constants.tsx';
 import { searchClubsAI } from '../services/geminiService.ts';
 import { Club } from '../types.ts';
 
-const Clubs: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }) => {
+interface ClubsProps {
+  onSelectClub: (id: string) => void;
+  customClubs?: Club[];
+}
+
+const Clubs: React.FC<ClubsProps> = ({ onSelectClub, customClubs }) => {
+  const displayClubs = customClubs || MOCK_CLUBS;
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredClubs, setFilteredClubs] = useState<Club[]>(MOCK_CLUBS);
+  const [filteredClubs, setFilteredClubs] = useState<Club[]>(displayClubs);
   const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    setFilteredClubs(displayClubs);
+  }, [displayClubs]);
 
   const handleAISearch = async () => {
     if (!searchQuery.trim()) {
-      setFilteredClubs(MOCK_CLUBS);
+      setFilteredClubs(displayClubs);
       return;
     }
     setIsSearching(true);
-    const resultIds = await searchClubsAI(searchQuery, MOCK_CLUBS);
+    const resultIds = await searchClubsAI(searchQuery, displayClubs);
     if (resultIds.length > 0) {
-      setFilteredClubs(MOCK_CLUBS.filter(c => resultIds.includes(c.id)));
+      setFilteredClubs(displayClubs.filter(c => resultIds.includes(c.id)));
     } else {
       setFilteredClubs([]);
     }
@@ -91,7 +101,7 @@ const Clubs: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub 
               </div>
               <div className="flex flex-col">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-2xl font-black tracking-tighter uppercase leading-tight group-hover:text-blue-400 transition-colors">{club.name}</h3>
+                  <h3 className="text-2xl font-black tracking-tighter uppercase leading-tight group-hover:text-blue-400 transition-colors truncate pr-2">{club.name}</h3>
                   <span className="text-[10px] border border-blue-500/40 text-blue-400 px-2 py-0.5 tracking-tighter font-bold uppercase shrink-0 mt-1">
                     {club.category}
                   </span>

@@ -1,11 +1,17 @@
 
 import React, { useState } from 'react';
-import { MOCK_SPONSORS } from '../constants';
+import { MOCK_SPONSORS } from '../constants.tsx';
+import { Sponsor } from '../types.ts';
 
-const Sponsors: React.FC = () => {
+interface SponsorsProps {
+  customSponsors?: Sponsor[];
+}
+
+const Sponsors: React.FC<SponsorsProps> = ({ customSponsors }) => {
   const [tab, setTab] = useState<'INDIVIDUAL' | 'CORPORATE'>('INDIVIDUAL');
+  const displaySponsors = customSponsors || MOCK_SPONSORS;
 
-  const filteredSponsors = MOCK_SPONSORS.filter(s => s.type === tab);
+  const filteredSponsors = displaySponsors.filter(s => s.type === tab);
 
   return (
     <div className="min-h-screen bg-black p-6 md:p-24">

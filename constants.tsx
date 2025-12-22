@@ -1,5 +1,5 @@
 
-import { Club, CommunityPost, Sponsor, FeedPost } from './types.ts';
+import { Club, Sponsor, FeedPost, Post } from './types.ts';
 
 export const MOCK_CLUBS: Club[] = [
   {
@@ -109,6 +109,40 @@ export const MOCK_FEED_POSTS: FeedPost[] = [
   }
 ];
 
+// Add MOCK_POSTS for the Community page to resolve compilation error
+export const MOCK_POSTS: Post[] = [
+  {
+    id: '1',
+    title: '대학생 창업팀을 위한 엔젤 투자 가이드',
+    author: '김엔젤',
+    authorRole: 'ANGEL',
+    views: 1240,
+    likes: 45,
+    comments: 12,
+    createdAt: '2024.05.20'
+  },
+  {
+    id: '2',
+    title: '2024 하반기 동아리 홍보 전략 공유',
+    author: '스누 해커스',
+    authorRole: 'CLUB',
+    views: 890,
+    likes: 32,
+    comments: 5,
+    createdAt: '2024.05.18'
+  },
+  {
+    id: '3',
+    title: '기업 파트너십 제안서 작성 꿀팁',
+    author: '현대자동차 테크팀',
+    authorRole: 'ANGEL',
+    views: 2100,
+    likes: 88,
+    comments: 24,
+    createdAt: '2024.05.15'
+  }
+];
+
 export const MOCK_SPONSORS: Sponsor[] = [
   {
     id: 's1',
@@ -129,19 +163,5 @@ export const MOCK_SPONSORS: Sponsor[] = [
     totalDonated: 50000000,
     logo: 'https://picsum.photos/seed/h-logo/100/100',
     isPartner: true
-  }
-];
-
-export const MOCK_POSTS: CommunityPost[] = [
-  {
-    id: '1',
-    author: '스누해커스_회장',
-    authorRole: 'CLUB',
-    title: '동아리 후원금 투명하게 공개하는 법',
-    content: '엔젤캠퍼스 플랫폼을 쓰면서 가장 좋았던 건...',
-    createdAt: '2024-05-20',
-    views: 1542,
-    likes: 89,
-    comments: 15
   }
 ];
