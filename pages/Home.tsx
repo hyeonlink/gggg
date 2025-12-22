@@ -8,7 +8,6 @@ interface HomeProps {
   customPosts?: FeedPost[];
 }
 
-// Fixed missing export and completed truncated structure from prompt
 const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
   const displayPosts = customPosts || MOCK_FEED_POSTS;
 
@@ -31,16 +30,6 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
                   <div className="flex justify-between text-[11px] font-bold tracking-widest text-white/40">
                     <span>팔로잉 동아리</span>
                     <span className="text-white">4</span>
-                  </div>
-               </div>
-            </div>
-
-            <div className="bg-blue-600/10 border border-blue-500/20 p-5 rounded-sm">
-               <div className="text-[10px] font-black tracking-widest text-blue-400 uppercase mb-4">ILC 실시간 대시보드</div>
-               <div className="space-y-4">
-                  <div>
-                    <div className="text-2xl font-black italic">₩1.2B+</div>
-                    <div className="text-[9px] text-white/40 font-bold uppercase tracking-widest">누적 매칭액</div>
                   </div>
                </div>
             </div>
@@ -77,19 +66,14 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
                   <div className="px-4 md:px-6 py-3 flex justify-between items-center text-[9px] md:text-[10px] text-white/30 font-bold tracking-widest uppercase border-b border-white/5">
                      <div className="flex gap-4">
                         <span className="flex items-center gap-1"><i className="fa-solid fa-heart text-red-500/60"></i> {post.likes}</span>
-                        <span className="flex items-center gap-1"><i className="fa-solid fa-comment text-blue-500/60"></i> {post.comments}</span>
                      </div>
-                     <span className="hidden xs:inline italic">VERIFIED BY I LOVE CLUB</span>
+                     <span className="hidden xs:inline italic tracking-tighter uppercase">Angel Campus Live Feed</span>
                   </div>
 
-                  <div className="grid grid-cols-4 bg-white/[0.01]">
+                  <div className="grid grid-cols-3 bg-white/[0.01]">
                      <button className="flex items-center justify-center gap-2 py-4 hover:bg-white/5 text-[10px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5">
                         <i className="fa-regular fa-thumbs-up"></i>
                         <span className="hidden sm:inline">좋아요</span>
-                     </button>
-                     <button className="flex items-center justify-center gap-2 py-4 hover:bg-white/5 text-[10px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5">
-                        <i className="fa-regular fa-comment"></i>
-                        <span className="hidden sm:inline">댓글</span>
                      </button>
                      <button className="flex items-center justify-center gap-2 py-4 hover:bg-white/5 text-[10px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5">
                         <i className="fa-solid fa-share-nodes"></i>
@@ -99,8 +83,8 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
                        onClick={() => onSelectClub(post.clubId)}
                        className="flex items-center justify-center gap-2 py-4 bg-blue-600 text-white text-[10px] font-black tracking-widest uppercase hover:bg-blue-500 transition-all"
                      >
-                        <i className="fa-solid fa-circle-info"></i>
-                        <span className="hidden sm:inline">브랜드 보기</span>
+                        <i className="fa-solid fa-calendar-check"></i>
+                        <span className="hidden sm:inline">일정 보기</span>
                      </button>
                   </div>
                 </div>
