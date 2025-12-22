@@ -80,6 +80,7 @@ export interface Post {
 export interface Sponsor {
   id: string;
   name: string;
+  email: string; // 추가됨
   type: 'INDIVIDUAL' | 'CORPORATE';
   description: string;
   interest: string[];

@@ -109,7 +109,6 @@ export const MOCK_FEED_POSTS: FeedPost[] = [
   }
 ];
 
-// Add MOCK_POSTS for the Community page to resolve compilation error
 export const MOCK_POSTS: Post[] = [
   {
     id: '1',
@@ -147,6 +146,7 @@ export const MOCK_SPONSORS: Sponsor[] = [
   {
     id: 's1',
     name: '김엔젤',
+    email: 'angel.kim@vc-firm.com',
     type: 'INDIVIDUAL',
     description: 'IT 스타트업 창업가로서 열정 있는 공대 동아리들을 후원합니다.',
     interest: ['보안', 'AI', '창업'],
@@ -157,6 +157,7 @@ export const MOCK_SPONSORS: Sponsor[] = [
   {
     id: 's2',
     name: '현대자동차 테크팀',
+    email: 'tech.support@hyundai.co.kr',
     type: 'CORPORATE',
     description: '미래 모빌리티를 연구하는 동아리들과 파트너십을 맺고 있습니다.',
     interest: ['자율주행', '로보틱스', '임베디드'],

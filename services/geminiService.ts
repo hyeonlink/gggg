@@ -2,30 +2,44 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 /**
- * 프로젝트 내용과 후원자 데이터를 분석하여 가장 적합한 엔젤 후원자들을 매칭합니다.
- * 'AI 홍보실'의 핵심 엔진입니다.
+ * 사용자가 입력한 '찾는 후원자 상'과 '메시지 내용'을 바탕으로
+ * 전체 후원자 DB에서 가장 적합한 1~3명을 정밀 타겟팅합니다.
  */
-export const matchSponsorsAI = async (projectDetails: {
+export const matchSponsorsAI = async (params: {
+  targetQuery: string; // "어떤 사람을 찾는지"에 대한 설명
+  messageContent: string; // 실제 보낼 내용
   clubName: string;
-  projectTitle: string;
-  description: string;
 }, sponsorsData: any[]) => {
-  const { clubName, projectTitle, description } = projectDetails;
+  const { targetQuery, messageContent, clubName } = params;
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const systemInstruction = `당신은 '엔젤캠퍼스(Angel Campus)'의 초정밀 매칭 AI 엔진입니다.
-  대학 동아리의 프로젝트 제안서를 분석하여, 가장 후원 가능성이 높고 관심 분야가 일치하는 엔젤 후원자를 선별합니다.
-  단순한 키워드 매칭을 넘어 프로젝트의 비전과 후원자의 철학적 일치도를 최우선으로 고려하세요.`;
+  const systemInstruction = `당신은 '엔젤캠퍼스'의 지능형 이메일 아웃리치 매칭 엔진입니다. 
+  사용자의 요구사항(targetQuery)과 실제 발송될 이메일 본문(messageContent)을 분석하여, 
+  가장 높은 응답률을 보일 최적의 엔젤(후원자)을 데이터베이스에서 선별하는 것이 임무입니다.
+  
+  선별 기준:
+  1. targetQuery에 기술된 페르소나와 후원자의 프로필(interest, description) 유사도.
+  2. messageContent에 담긴 프로젝트의 성격과 후원자의 전문 분야 일치도.
+  3. 후원자의 유형(INDIVIDUAL/CORPORATE)과 요청 내용의 규모 적합성.
+  
+  단순한 키워드 매칭을 넘어, 문맥적인 의도를 파악하여 가장 성공 가능성이 높은 상대를 고르세요.`;
 
   const prompt = `
     [발신 동아리]: ${clubName}
-    [제안 프로젝트]: ${projectTitle}
-    [메시지 본문]: ${description}
+    [검색 타겟 쿼리]: "${targetQuery}"
+    [발송될 이메일 본문]: "${messageContent.substring(0, 800)}"
     
-    [잠재 후원자 리스트]: ${JSON.stringify(sponsorsData.map(s => ({ id: s.id, name: s.name, description: s.description, interest: s.interest })))}
+    [후원자 데이터베이스]: ${JSON.stringify(sponsorsData.map(s => ({ 
+      id: s.id, 
+      name: s.name, 
+      email: s.email,
+      description: s.description, 
+      interest: s.interest,
+      type: s.type 
+    })))}
     
-    위 본문의 톤앤매너와 키워드를 분석하여, 위 리스트 중 가장 적합한 1~3명의 후원자 ID만 엄선하여 JSON 배열(["id1", "id2"]) 형태로 반환하세요.
-    반드시 리스트에 존재하는 ID여야 하며, 관련성이 낮다면 1명만 선택해도 무방합니다.
+    위 데이터베이스에서 검색 타겟 쿼리와 이메일 본문에 가장 부합하는 후원자 ID를 최대 3명까지 엄선하세요. 
+    반드시 리스트에 실존하는 ID만 반환하며, JSON 배열 ["id1", "id2"] 형식으로만 응답하세요.
   `;
 
   try {
