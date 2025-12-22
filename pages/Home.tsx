@@ -16,7 +16,9 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
+          {/* Left Sidebar (3 cols) */}
           <div className="hidden lg:block lg:col-span-3 space-y-6 sticky top-28">
+            {/* User Profile Card */}
             <div className="bg-[#111] border border-white/10 overflow-hidden rounded-sm shadow-xl">
                <div className="h-20 bg-gradient-to-r from-blue-900 to-blue-600"></div>
                <div className="p-6 -mt-12 text-center">
@@ -33,10 +35,57 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
                   </div>
                </div>
             </div>
+
+            {/* Weekly Popular Clubs */}
+            <div className="bg-[#111] border border-white/10 p-6 rounded-sm shadow-xl">
+               <div className="flex items-center gap-2 mb-6">
+                  <div className="w-1 h-3 bg-blue-600"></div>
+                  <h4 className="text-[11px] font-black tracking-widest text-white uppercase">주간 인기 동아리</h4>
+               </div>
+               <div className="space-y-6">
+                 {MOCK_CLUBS.slice(0, 3).map(club => (
+                   <div key={club.id} className="flex gap-4 items-center group cursor-pointer" onClick={() => onSelectClub(club.id)}>
+                      <div className="w-10 h-10 bg-neutral-800 border border-white/10 shrink-0 overflow-hidden">
+                        <img src={club.logo} className="w-full h-full object-cover group-hover:scale-110 transition-all" alt={club.name} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[11px] font-black truncate group-hover:text-blue-400 transition-colors uppercase">{club.name}</div>
+                        <div className="text-[9px] text-white/20 font-bold tracking-widest uppercase">{club.university}</div>
+                      </div>
+                   </div>
+                 ))}
+               </div>
+            </div>
+
+            {/* Recommended Clubs (New Section) */}
+            <div className="bg-[#111] border border-white/10 p-6 rounded-sm shadow-xl">
+               <div className="flex items-center gap-2 mb-6">
+                  <div className="w-1 h-3 bg-blue-400/50"></div>
+                  <h4 className="text-[11px] font-black tracking-widest text-white/60 uppercase">추천 동아리</h4>
+               </div>
+               <div className="space-y-6">
+                 {/* Slice differently or use a logic to show other clubs */}
+                 {[...MOCK_CLUBS].reverse().slice(0, 2).map(club => (
+                   <div key={club.id} className="flex gap-4 items-center group cursor-pointer" onClick={() => onSelectClub(club.id)}>
+                      <div className="w-10 h-10 bg-neutral-800 border border-white/10 shrink-0 overflow-hidden grayscale group-hover:grayscale-0 transition-all">
+                        <img src={club.logo} className="w-full h-full object-cover group-hover:scale-110 transition-all" alt={club.name} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-[11px] font-black truncate group-hover:text-blue-400 transition-colors uppercase text-white/80">{club.name}</div>
+                        <div className="text-[8px] text-white/20 font-bold tracking-widest uppercase">{club.category}</div>
+                      </div>
+                   </div>
+                 ))}
+               </div>
+               <button className="w-full mt-6 py-2 border border-white/5 text-[9px] font-black tracking-widest uppercase text-white/30 hover:text-white hover:border-white/20 transition-all">
+                 더 보기
+               </button>
+            </div>
           </div>
 
-          <div className="col-span-1 lg:col-span-6 space-y-8 min-w-0">
-            <div className="space-y-10">
+          {/* Main Feed (9 cols) */}
+          <div className="col-span-1 lg:col-span-9 space-y-8 min-w-0">
+            <div className="max-w-4xl lg:mx-0 space-y-10">
               {displayPosts.map((post) => (
                 <div key={post.id} className="bg-[#111] border border-white/10 rounded-sm overflow-hidden flex flex-col shadow-2xl transition-all hover:border-white/20">
                   <div className="p-4 md:p-6 flex justify-between items-start">
@@ -92,24 +141,6 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
             </div>
           </div>
 
-          <div className="hidden lg:block lg:col-span-3 space-y-6 sticky top-28">
-            <div className="bg-[#111] border border-white/10 p-6 rounded-sm shadow-xl">
-               <h4 className="text-[11px] font-black tracking-widest text-white uppercase mb-6">주간 인기 동아리</h4>
-               <div className="space-y-6">
-                 {MOCK_CLUBS.slice(0, 3).map(club => (
-                   <div key={club.id} className="flex gap-4 items-center group cursor-pointer" onClick={() => onSelectClub(club.id)}>
-                      <div className="w-10 h-10 bg-neutral-800 border border-white/10 shrink-0 overflow-hidden">
-                        <img src={club.logo} className="w-full h-full object-cover" alt={club.name} />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-[11px] font-black truncate group-hover:text-blue-400 transition-colors uppercase">{club.name}</div>
-                        <div className="text-[9px] text-white/20 font-bold tracking-widest uppercase">{club.university}</div>
-                      </div>
-                   </div>
-                 ))}
-               </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
