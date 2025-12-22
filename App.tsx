@@ -24,6 +24,7 @@ const App: React.FC = () => {
   const [posts, setPosts] = useState<FeedPost[]>(MOCK_FEED_POSTS);
   const [sponsors, setSponsors] = useState<Sponsor[]>(MOCK_SPONSORS);
   const [pendingClubs, setPendingClubs] = useState<Club[]>([]);
+  const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
   
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -68,6 +69,32 @@ const App: React.FC = () => {
     setSelectedClubId(id);
     setCurrentPage('CLUB_PROFILE');
     window.scrollTo(0, 0);
+  };
+
+  const handleLikePost = (postId: string) => {
+    setLikedPostIds(prev => {
+      const next = new Set(prev);
+      const isCurrentlyLiked = next.has(postId);
+      
+      if (isCurrentlyLiked) {
+        next.delete(postId);
+      } else {
+        next.add(postId);
+      }
+      
+      // Update posts state to reflect the like count change visually
+      setPosts(currentPosts => currentPosts.map(p => {
+        if (p.id === postId) {
+          return {
+            ...p,
+            likes: isCurrentlyLiked ? p.likes - 1 : p.likes + 1
+          };
+        }
+        return p;
+      }));
+
+      return next;
+    });
   };
 
   const handleAddPost = async (newPostData: Omit<FeedPost, 'id' | 'createdAt' | 'likes' | 'comments'>) => {
@@ -127,7 +154,7 @@ const App: React.FC = () => {
 
     switch (currentPage) {
       case 'HOME':
-        return <Home onSelectClub={selectClub} customPosts={posts} />;
+        return <Home onSelectClub={selectClub} onLikePost={handleLikePost} likedPostIds={likedPostIds} customPosts={posts} />;
       case 'CLUBS':
         return <Clubs onSelectClub={selectClub} customClubs={clubs} />;
       case 'RANKING':
@@ -139,7 +166,7 @@ const App: React.FC = () => {
       case 'REGISTER_CLUB':
         return <ClubRegistration onRegister={() => {}} />;
       default:
-        return <Home onSelectClub={selectClub} customPosts={posts} />;
+        return <Home onSelectClub={selectClub} onLikePost={handleLikePost} likedPostIds={likedPostIds} customPosts={posts} />;
     }
   };
 

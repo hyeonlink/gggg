@@ -5,10 +5,12 @@ import { FeedPost } from '../types.ts';
 
 interface HomeProps {
   onSelectClub: (id: string) => void;
+  onLikePost: (id: string) => void;
+  likedPostIds: Set<string>;
   customPosts?: FeedPost[];
 }
 
-const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
+const Home: React.FC<HomeProps> = ({ onSelectClub, onLikePost, likedPostIds, customPosts }) => {
   const displayPosts = customPosts || MOCK_FEED_POSTS;
 
   return (
@@ -57,14 +59,13 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
                </div>
             </div>
 
-            {/* Recommended Clubs (New Section) */}
+            {/* Recommended Clubs */}
             <div className="bg-[#111] border border-white/10 p-6 rounded-sm shadow-xl">
                <div className="flex items-center gap-2 mb-6">
                   <div className="w-1 h-3 bg-blue-400/50"></div>
                   <h4 className="text-[11px] font-black tracking-widest text-white/60 uppercase">추천 동아리</h4>
                </div>
                <div className="space-y-6">
-                 {/* Slice differently or use a logic to show other clubs */}
                  {[...MOCK_CLUBS].reverse().slice(0, 2).map(club => (
                    <div key={club.id} className="flex gap-4 items-center group cursor-pointer" onClick={() => onSelectClub(club.id)}>
                       <div className="w-10 h-10 bg-neutral-800 border border-white/10 shrink-0 overflow-hidden grayscale group-hover:grayscale-0 transition-all">
@@ -86,58 +87,67 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, customPosts }) => {
           {/* Main Feed (9 cols) */}
           <div className="col-span-1 lg:col-span-9 space-y-8 min-w-0">
             <div className="max-w-4xl lg:mx-0 space-y-10">
-              {displayPosts.map((post) => (
-                <div key={post.id} className="bg-[#111] border border-white/10 rounded-sm overflow-hidden flex flex-col shadow-2xl transition-all hover:border-white/20">
-                  <div className="p-4 md:p-6 flex justify-between items-start">
-                    <div className="flex gap-3 md:gap-4 cursor-pointer group min-w-0 flex-grow" onClick={() => onSelectClub(post.clubId)}>
-                       <div className="w-10 h-10 md:w-12 md:h-12 bg-neutral-800 border border-white/10 shrink-0">
-                          <img src={post.clubLogo} alt={post.clubName} className="w-full h-full object-cover" />
+              {displayPosts.map((post) => {
+                const isLiked = likedPostIds.has(post.id);
+                return (
+                  <div key={post.id} className="bg-[#111] border border-white/10 rounded-sm overflow-hidden flex flex-col shadow-2xl transition-all hover:border-white/20">
+                    <div className="p-4 md:p-6 flex justify-between items-start">
+                      <div className="flex gap-3 md:gap-4 cursor-pointer group min-w-0 flex-grow" onClick={() => onSelectClub(post.clubId)}>
+                         <div className="w-10 h-10 md:w-12 md:h-12 bg-neutral-800 border border-white/10 shrink-0">
+                            <img src={post.clubLogo} alt={post.clubName} className="w-full h-full object-cover" />
+                         </div>
+                         <div className="min-w-0 flex-grow">
+                            <h4 className="font-black tracking-tighter text-sm md:text-lg uppercase leading-tight group-hover:text-blue-400 transition-colors truncate">{post.clubName}</h4>
+                            <div className="text-[9px] md:text-[10px] text-white/40 font-bold tracking-widest uppercase mt-0.5 truncate">
+                              {post.university} • {post.createdAt}
+                            </div>
+                         </div>
+                      </div>
+                    </div>
+
+                    <div className="px-4 md:px-6 pb-4 md:pb-6">
+                      <p className="text-white/80 font-light leading-relaxed break-words whitespace-pre-wrap text-sm md:text-base">{post.content}</p>
+                    </div>
+
+                    {post.image && (
+                      <div className="w-full bg-neutral-900 border-y border-white/5 overflow-hidden flex items-center justify-center min-h-[180px] md:min-h-[250px]">
+                         <img src={post.image} className="w-full h-auto max-h-[500px] object-contain" alt="Post context" />
+                      </div>
+                    )}
+
+                    <div className="px-4 md:px-6 py-3 flex justify-between items-center text-[9px] md:text-[10px] text-white/30 font-bold tracking-widest uppercase border-b border-white/5">
+                       <div className="flex gap-4">
+                          <span className="flex items-center gap-1">
+                            <i className={`fa-solid fa-heart ${isLiked ? 'text-red-500' : 'text-red-500/20'} transition-colors`}></i> 
+                            {post.likes}
+                          </span>
                        </div>
-                       <div className="min-w-0 flex-grow">
-                          <h4 className="font-black tracking-tighter text-sm md:text-lg uppercase leading-tight group-hover:text-blue-400 transition-colors truncate">{post.clubName}</h4>
-                          <div className="text-[9px] md:text-[10px] text-white/40 font-bold tracking-widest uppercase mt-0.5 truncate">
-                            {post.university} • {post.createdAt}
-                          </div>
-                       </div>
+                       <span className="hidden xs:inline italic tracking-tighter uppercase">Angel Campus Live Feed</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 bg-white/[0.01]">
+                       <button 
+                         onClick={() => onLikePost(post.id)}
+                         className={`flex items-center justify-center gap-2 py-4 hover:bg-white/5 text-[10px] font-black tracking-widest transition-all uppercase border-r border-white/5 ${isLiked ? 'text-blue-500' : 'text-white/40'}`}
+                       >
+                          <i className={`${isLiked ? 'fa-solid' : 'fa-regular'} fa-thumbs-up`}></i>
+                          <span className="hidden sm:inline">{isLiked ? '좋아요 취소' : '좋아요'}</span>
+                       </button>
+                       <button className="flex items-center justify-center gap-2 py-4 hover:bg-white/5 text-[10px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5">
+                          <i className="fa-solid fa-share-nodes"></i>
+                          <span className="hidden sm:inline">공유</span>
+                       </button>
+                       <button 
+                         onClick={() => onSelectClub(post.clubId)}
+                         className="flex items-center justify-center gap-2 py-4 bg-blue-600 text-white text-[10px] font-black tracking-widest uppercase hover:bg-blue-500 transition-all"
+                       >
+                          <i className="fa-solid fa-calendar-check"></i>
+                          <span className="hidden sm:inline">일정 보기</span>
+                       </button>
                     </div>
                   </div>
-
-                  <div className="px-4 md:px-6 pb-4 md:pb-6">
-                    <p className="text-white/80 font-light leading-relaxed break-words whitespace-pre-wrap text-sm md:text-base">{post.content}</p>
-                  </div>
-
-                  {post.image && (
-                    <div className="w-full bg-neutral-900 border-y border-white/5 overflow-hidden flex items-center justify-center min-h-[180px] md:min-h-[250px]">
-                       <img src={post.image} className="w-full h-auto max-h-[500px] object-contain" alt="Post context" />
-                    </div>
-                  )}
-
-                  <div className="px-4 md:px-6 py-3 flex justify-between items-center text-[9px] md:text-[10px] text-white/30 font-bold tracking-widest uppercase border-b border-white/5">
-                     <div className="flex gap-4">
-                        <span className="flex items-center gap-1"><i className="fa-solid fa-heart text-red-500/60"></i> {post.likes}</span>
-                     </div>
-                     <span className="hidden xs:inline italic tracking-tighter uppercase">Angel Campus Live Feed</span>
-                  </div>
-
-                  <div className="grid grid-cols-3 bg-white/[0.01]">
-                     <button className="flex items-center justify-center gap-2 py-4 hover:bg-white/5 text-[10px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5">
-                        <i className="fa-regular fa-thumbs-up"></i>
-                        <span className="hidden sm:inline">좋아요</span>
-                     </button>
-                     <button className="flex items-center justify-center gap-2 py-4 hover:bg-white/5 text-[10px] font-black tracking-widest text-white/40 hover:text-white transition-all uppercase border-r border-white/5">
-                        <i className="fa-solid fa-share-nodes"></i>
-                        <span className="hidden sm:inline">공유</span>
-                     </button>
-                     <button 
-                       onClick={() => onSelectClub(post.clubId)}
-                       className="flex items-center justify-center gap-2 py-4 bg-blue-600 text-white text-[10px] font-black tracking-widest uppercase hover:bg-blue-500 transition-all"
-                     >
-                        <i className="fa-solid fa-calendar-check"></i>
-                        <span className="hidden sm:inline">일정 보기</span>
-                     </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
