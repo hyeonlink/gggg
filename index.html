@@ -8,8 +8,8 @@
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <!-- Tailwind CSS Play CDN with required plugins -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
     
     <script>
       tailwind.config = {
@@ -17,6 +17,9 @@
           extend: {
             colors: {
               'angel-blue': '#2563eb',
+            },
+            animation: {
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             screens: {
               'xs': '400px',
@@ -37,6 +40,11 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+        }
+        /* Ensure initial load state is clean */
+        #root {
+            min-height: 100vh;
+            background-color: #000000;
         }
         ::-webkit-scrollbar {
             width: 8px;
