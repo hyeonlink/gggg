@@ -11,11 +11,13 @@ import ClubRegistration from './pages/ClubRegistration.tsx';
 import AdminLogin from './pages/AdminLogin.tsx';
 import AdminDashboard from './pages/AdminDashboard.tsx';
 import Auth from './pages/Auth.tsx';
+import Landing from './pages/Landing.tsx';
 import { MOCK_CLUBS, MOCK_FEED_POSTS, MOCK_SPONSORS } from './constants.tsx';
 import { Club, FeedPost, Sponsor } from './types.ts';
 import { supabase } from './lib/supabase.ts';
 
 const App: React.FC = () => {
+  const [showLanding, setShowLanding] = useState(true);
   const [currentPage, setCurrentPage] = useState('HOME');
   const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
   
@@ -82,7 +84,6 @@ const App: React.FC = () => {
         next.add(postId);
       }
       
-      // Update posts state to reflect the like count change visually
       setPosts(currentPosts => currentPosts.map(p => {
         if (p.id === postId) {
           return {
@@ -169,6 +170,10 @@ const App: React.FC = () => {
         return <Home onSelectClub={selectClub} onLikePost={handleLikePost} likedPostIds={likedPostIds} customPosts={posts} />;
     }
   };
+
+  if (showLanding) {
+    return <Landing onStart={() => setShowLanding(false)} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-white selection:text-black bg-black">
