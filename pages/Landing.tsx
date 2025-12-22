@@ -45,7 +45,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
           </h1>
           <p className="max-w-xl mx-auto text-lg text-white/40 font-medium mb-12 leading-relaxed animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-200">
             엔젤캠퍼스는 동아리의 가치를 정밀하게 분석하여 <br/>
-            최적의 후원자와 연결하는 다크 프리미엄 비즈니스 인프라입니다.
+            최적의 후원자와 연결하는 비즈니스 인프라입니다.
           </p>
           <div className="flex justify-center mb-24 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-300">
             <button 
@@ -100,7 +100,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                 <span className="bg-white/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 inline-block">Real-time Outreach</span>
                 <h3 className="text-3xl font-black mb-4 leading-tight">AI가 대신하는 <br/>최적의 엔젤 발굴</h3>
                 <p className="text-blue-100/70 font-medium leading-relaxed">
-                  엔젤캠퍼스의 AI는 300ms 만에 동아리의 성향과 게시물을 분석하여 가장 적합한 후원자와 매칭을 시작합니다.
+                  엔젤캠퍼스의 AI는 XXXms 만에 동아리의 성향과 게시물을 분석하여 가장 적합한 후원자와 매칭을 시작합니다.
                 </p>
               </div>
               <div className="bg-white/10 rounded-2xl p-6 border border-white/10 mt-10">
@@ -114,7 +114,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                 <span className="bg-white/5 text-white/40 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 inline-block">Auto Emailing</span>
                 <h3 className="text-3xl font-black mb-4 leading-tight">개인화된 <br/>이메일 자동 발송</h3>
                 <p className="text-white/40 font-medium leading-relaxed">
-                  제안부터 사후 감사 인사까지. AI가 후원자 한 명 한 명에게 맞춘 전문적인 이메일을 자동으로 전송합니다.
+                  제안부터 사후 감사 인사까지. AI가 후원자 한 명 한 명에게 사용자가 직접 작성한 이메일을 자동으로 전송합니다.
                 </p>
               </div>
               <div className="bg-black rounded-2xl p-6 border border-white/5 mt-10 space-y-3">
@@ -127,7 +127,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
             <div className="bg-[#0a0a0a] rounded-[2.5rem] p-12 text-white border border-white/5 shadow-2xl flex flex-col justify-between min-h-[440px] group hover:-translate-y-2 transition-transform duration-500">
               <div>
                 <span className="bg-white/5 text-white/40 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 inline-block">Smart Discovery</span>
-                <h3 className="text-3xl font-black mb-4 leading-tight">유튜브처럼 <br/>추천되는 동아리</h3>
+                <h3 className="text-3xl font-black mb-4 leading-tight">XXX처럼 <br/>추천되는 동아리</h3>
                 <p className="text-white/40 font-medium leading-relaxed">
                   엔젤의 관심사에 맞춰 동아리의 프로젝트를 실시간으로 노출합니다. 기다리지 말고 먼저 발견되세요.
                 </p>
@@ -240,7 +240,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                     <div className="text-5xl font-black text-blue-600 italic min-w-[120px]">12+</div>
                     <div>
                        <h5 className="text-xl font-black mb-3 uppercase">Universities</h5>
-                       <p className="text-white/30 text-sm leading-relaxed">전국 12개 이상 주요 대학의 정동아리들이 이미 신뢰를 보내고 있습니다.</p>
+                       <p className="text-white/30 text-sm leading-relaxed">전국 00개 이상 주요 대학의 정동아리들이 이미 신뢰를 보내고 있습니다.</p>
                     </div>
                  </div>
                  <div className="flex gap-12 items-start border-t border-white/5 pt-12">
