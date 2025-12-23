@@ -22,23 +22,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ pendingClubs, allSponso
 
   const fetchUsers = async () => {
     setLoading(true);
-    // Note: In a real app, listing all users requires Supabase Service Role key
-    // For this client-side demo, we simulate fetching from a public profiles table
-    const { data, error } = await supabase
-      .from('users_profile')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (data) setDbUsers(data);
-    else {
-      // Fallback mock data if table doesn't exist yet
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      if (data) setDbUsers(data);
+    } catch (err) {
+      console.error("Error fetching profiles:", err);
       setDbUsers([
-        { id: 'u1', name: '김철수', email: 'chul@snu.ac.kr', role: 'CLUB_MEMBER', joined: '2024.01.12' },
-        { id: 'u2', name: '박영희', email: 'park@yonsei.ac.kr', role: 'ANGEL', joined: '2024.02.05' },
-        { id: 'u3', name: '이민호', email: 'lee@korea.ac.kr', role: 'CLUB_LEADER', joined: '2024.03.20' },
+        { id: 'u1', name: '김철수', email: 'chul@snu.ac.kr', role: 'CLUB', created_at: '2024-01-12T00:00:00Z' },
+        { id: 'u2', name: '박영희', email: 'park@yonsei.ac.kr', role: 'ANGEL', created_at: '2024-02-05T00:00:00Z' },
+        { id: 'u3', name: '이민호', email: 'lee@korea.ac.kr', role: 'ADMIN', created_at: '2024-03-20T00:00:00Z' },
       ]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -206,7 +207,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ pendingClubs, allSponso
                         </td>
                         <td className="p-6">
                            <div className="flex flex-wrap gap-2">
-                             {sponsor.interest.map(i => (
+                             {(sponsor.interest || []).map(i => (
                                <span key={i} className="text-[8px] text-white/30 border border-white/10 px-1.5 py-0.5 rounded-full uppercase">{i}</span>
                              ))}
                            </div>
@@ -243,7 +244,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ pendingClubs, allSponso
                            </div>
                         </td>
                         <td className="p-6 font-mono text-[11px] text-white/40">
-                           {user.email || user.phone || 'N/A'}
+                           {user.email || 'No Email'}
                         </td>
                         <td className="p-6">
                            <span className="text-[9px] font-black border border-white/20 px-2 py-0.5 tracking-widest uppercase text-white/60">
@@ -251,7 +252,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ pendingClubs, allSponso
                            </span>
                         </td>
                         <td className="p-6 font-mono text-[11px] text-white/20">
-                           {user.joined || new Date(user.created_at).toLocaleDateString()}
+                           {new Date(user.created_at).toLocaleDateString()}
                         </td>
                       </tr>
                     ))}

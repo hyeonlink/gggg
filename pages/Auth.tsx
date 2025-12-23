@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase.ts';
 
@@ -77,6 +76,7 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     setLoading(true);
     setError('');
 
+    // Demo/Admin Bypass
     if (email === 'admin' && password === 'admin') {
       setLoading(false);
       onAuthSuccess(true);
@@ -99,15 +99,17 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         if (signUpError) throw signUpError;
 
         if (signUpData.user) {
-          // Assign role in profiles table
-          const { error: profileError } = await supabase.from('profiles').insert([
-            {
-              id: signUpData.user.id,
-              email: signUpData.user.email,
-              role: 'CLUB',
-            },
-          ]);
-          if (profileError) console.error("Profile creation error:", profileError);
+          try {
+            await supabase.from('profiles').insert([
+              {
+                id: signUpData.user.id,
+                email: signUpData.user.email,
+                role: 'CLUB',
+              },
+            ]);
+          } catch (profileErr) {
+            console.warn("Profile creation deferred:", profileErr);
+          }
         }
 
         alert('엔젤캠퍼스 가입을 축하드립니다! 로그인을 진행해주세요.');
@@ -116,14 +118,23 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         
-        // Check role
         if (data.user) {
-          const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
-          onAuthSuccess(profile?.role === 'ADMIN');
+          try {
+            const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+            onAuthSuccess(profile?.role === 'ADMIN');
+          } catch (pErr) {
+            // If profile check fails due to fetch, assume basic member
+            onAuthSuccess(false);
+          }
         }
       }
     } catch (err: any) {
-      setError(err.message || '인증 중 오류가 발생했습니다.');
+      const msg = err.message || "";
+      if (msg.toLowerCase().includes("fetch")) {
+        setError('서버 연결에 실패했습니다. 인터넷 상태를 확인하거나 잠시 후 다시 시도해주세요.');
+      } else {
+        setError(msg || '인증 중 오류가 발생했습니다.');
+      }
     } finally {
       setLoading(false);
     }

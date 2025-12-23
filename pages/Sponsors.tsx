@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MOCK_SPONSORS } from '../constants.tsx';
 import { Sponsor } from '../types.ts';
@@ -9,7 +8,9 @@ interface SponsorsProps {
 
 const Sponsors: React.FC<SponsorsProps> = ({ customSponsors }) => {
   const [tab, setTab] = useState<'INDIVIDUAL' | 'CORPORATE'>('INDIVIDUAL');
-  const displaySponsors = customSponsors || MOCK_SPONSORS;
+  
+  // customSponsors가 비어있는 배열([])일 경우에도 MOCK 데이터를 쓰도록 수정
+  const displaySponsors = customSponsors && customSponsors.length > 0 ? customSponsors : MOCK_SPONSORS;
 
   const filteredSponsors = displaySponsors.filter(s => s.type === tab);
 
@@ -43,7 +44,7 @@ const Sponsors: React.FC<SponsorsProps> = ({ customSponsors }) => {
 
         {/* Sponsors Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {filteredSponsors.map((sponsor) => (
+          {filteredSponsors.length > 0 ? filteredSponsors.map((sponsor) => (
             <div key={sponsor.id} className="bg-[#0f0f0f] border border-white/5 p-8 group hover:border-blue-500/40 transition-all flex flex-col">
                <div className="flex items-start justify-between mb-8">
                   <div className="w-20 h-20 bg-neutral-800 border border-white/10 overflow-hidden shadow-lg">
@@ -63,21 +64,25 @@ const Sponsors: React.FC<SponsorsProps> = ({ customSponsors }) => {
                   <div>
                     <div className="text-[10px] text-blue-400/50 tracking-widest uppercase mb-2 font-bold">관심 분야</div>
                     <div className="flex flex-wrap gap-2">
-                       {sponsor.interest.map(i => (
+                       {(sponsor.interest || []).map(i => (
                          <span key={i} className="text-[9px] font-bold border border-blue-500/20 px-2 py-0.5 text-blue-300 bg-blue-500/5">#{i}</span>
                        ))}
                     </div>
                   </div>
                   <div className="pt-4 border-t border-white/5 flex justify-between items-center">
                     <span className="text-[10px] text-white/20 tracking-widest uppercase">누적 후원액</span>
-                    <span className="text-sm font-mono font-bold text-white/80">₩{sponsor.totalDonated.toLocaleString()}</span>
+                    <span className="text-sm font-mono font-bold text-white/80">₩{(sponsor.totalDonated || 0).toLocaleString()}</span>
                   </div>
                   <button className="w-full mt-4 py-3 border border-blue-500/20 text-[10px] font-black tracking-widest uppercase hover:bg-blue-600 hover:text-white transition-all">
                     프로젝트 제안하기
                   </button>
                </div>
             </div>
-          ))}
+          )) : (
+            <div className="col-span-full py-20 text-center border border-dashed border-white/10">
+              <p className="text-white/20 font-black tracking-[0.5em] uppercase text-xs italic">해당 유형의 후원자가 존재하지 않습니다.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

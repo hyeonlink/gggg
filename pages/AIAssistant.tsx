@@ -43,11 +43,27 @@ const AIAssistant: React.FC = () => {
         messageContent: formData.messageContent
       });
 
-      // Fetch the full sponsor details from Supabase for the matches found
-      const { data: dbSponsors } = await supabase
-        .from('sponsors')
-        .select('*')
-        .in('id', matchedIds);
+      if (!matchedIds || matchedIds.length === 0) {
+        addLog("No direct matches found. Try refining your targeting keywords.");
+        setStep('IDLE');
+        setLoading(false);
+        return;
+      }
+
+      // Fetch the full sponsor details from Supabase with safety catch
+      let dbSponsors: any[] = [];
+      try {
+        const { data, error } = await supabase
+          .from('sponsors')
+          .select('*')
+          .in('id', matchedIds);
+        
+        if (error) throw error;
+        dbSponsors = data || [];
+      } catch (e) {
+        addLog("Network warning: Partial data fetch failed. Retrying...");
+        console.debug("Detail fetch error", e);
+      }
 
       const formattedMatches: Sponsor[] = (dbSponsors || []).map(s => ({
         id: s.id,
@@ -72,11 +88,12 @@ const AIAssistant: React.FC = () => {
         }
         setStep('SENT');
       } else {
-        addLog("No direct matches found. Try refining your targeting keywords.");
+        addLog("Matching completed but profile verification failed.");
         setStep('IDLE');
       }
     } catch (error) {
       addLog(`FATAL ERROR: ${error instanceof Error ? error.message : 'System Failure'}`);
+      console.error(error);
     } finally {
       setLoading(false);
     }

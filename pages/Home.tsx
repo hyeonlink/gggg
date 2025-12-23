@@ -11,7 +11,8 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ onSelectClub, onLikePost, likedPostIds, customPosts }) => {
-  const displayPosts = customPosts || MOCK_FEED_POSTS;
+  // 빈 배열일 경우에도 Mock 데이터를 보여주도록 수정
+  const displayPosts = customPosts && customPosts.length > 0 ? customPosts : MOCK_FEED_POSTS;
 
   return (
     <div className="min-h-screen bg-[#000000] text-white overflow-x-hidden font-sans">
@@ -22,7 +23,8 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, onLikePost, likedPostIds, cus
           <div className="hidden lg:block lg:col-span-3 space-y-6 sticky top-28">
             {/* User Profile Card */}
             <div className="bg-[#111] border border-white/10 overflow-hidden rounded-sm shadow-xl">
-               <div className="h-20 bg-gradient-to-r from-blue-900 to-blue-600"></div>
+               {/* 그라데이션 제거: bg-gradient-to-r from-blue-900 to-blue-600 -> bg-blue-800 */}
+               <div className="h-20 bg-blue-800"></div>
                <div className="p-6 -mt-12 text-center">
                   <div className="w-20 h-20 rounded-full border-2 border-[#111] bg-neutral-800 mx-auto overflow-hidden mb-4 shadow-xl">
                     <img src="https://picsum.photos/seed/me/100/100" className="w-full h-full object-cover" alt="Profile" />
@@ -86,8 +88,7 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, onLikePost, likedPostIds, cus
 
           {/* Main Feed (9 cols) */}
           <div className="col-span-1 lg:col-span-9 space-y-6 min-w-0">
-            {/* Further reduced width from max-w-2xl to max-w-xl for a more compact look */}
-            <div className="max-w-xl lg:mx-0 space-y-5">
+            <div className="w-full lg:max-w-3xl lg:mx-0 space-y-5">
               {displayPosts.map((post) => {
                 const isLiked = likedPostIds.has(post.id);
                 return (
@@ -112,7 +113,7 @@ const Home: React.FC<HomeProps> = ({ onSelectClub, onLikePost, likedPostIds, cus
 
                     {post.image && (
                       <div className="w-full bg-neutral-900 border-y border-white/5 overflow-hidden flex items-center justify-center min-h-[120px] md:min-h-[180px]">
-                         <img src={post.image} className="w-full h-auto max-h-[300px] object-contain" alt="Post context" />
+                         <img src={post.image} className="w-full h-auto max-h-[500px] object-contain" alt="Post context" />
                       </div>
                     )}
 

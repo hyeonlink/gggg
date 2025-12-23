@@ -1,18 +1,10 @@
-
 import { createClient } from '@supabase/supabase-js';
 
 /**
- * DATABASE SCHEMA REFERENCE
- * 
- * profiles: id (uuid), email (text), role (text: 'CLUB'|'ANGEL'|'ADMIN'), created_at (timestamptz)
- * clubs: id (uuid), owner_id (uuid), name (text), university (text), category (text), 
- *        description (text), long_description (text), logo_url (text), cover_url (text),
- *        tags (text[]), angel_score (int), total_funding (bigint), verification_status (text: 'PENDING'|'VERIFIED')
- * posts: id (uuid), club_id (uuid), content (text), image_url (text), likes (int), created_at (timestamptz)
- * sponsors: id (uuid), name (text), email (text), type (text), interest_tags (text[]), total_donated (bigint)
+ * Supabase Client Configuration
+ * Using hardcoded credentials for environment stability.
  */
-
 const supabaseUrl = 'https://ccrtzhqgagtnedlqqfpk.supabase.co';
-const supabaseAnonKey = 'sb_publishable_P7m792finwnZqyujyUgTnw_HXAEVuoF';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjcnR6aHFnYWd0bmVjbHFxZnBrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY0NTY5MjgsImV4cCI6MjA4MjAzMjkyOH0.zVBovv2KJoAYH3-SuQb9y-bTkdyZsEmTuYOTEQSKeJM';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

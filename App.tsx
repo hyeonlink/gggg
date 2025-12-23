@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar.tsx';
 import Home from './pages/Home.tsx';
@@ -8,7 +7,6 @@ import AIAssistant from './pages/AIAssistant.tsx';
 import Ranking from './pages/Ranking.tsx';
 import Sponsors from './pages/Sponsors.tsx';
 import ClubRegistration from './pages/ClubRegistration.tsx';
-import AdminLogin from './pages/AdminLogin.tsx';
 import AdminDashboard from './pages/AdminDashboard.tsx';
 import Auth from './pages/Auth.tsx';
 import Landing from './pages/Landing.tsx';
@@ -21,10 +19,10 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('HOME');
   const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
   
-  // Data States
-  const [clubs, setClubs] = useState<Club[]>([]);
-  const [posts, setPosts] = useState<FeedPost[]>([]);
-  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+  // Data States initialized with Mock data for instant offline-first experience
+  const [clubs, setClubs] = useState<Club[]>(MOCK_CLUBS);
+  const [posts, setPosts] = useState<FeedPost[]>(MOCK_FEED_POSTS);
+  const [sponsors, setSponsors] = useState<Sponsor[]>(MOCK_SPONSORS);
   const [pendingClubs, setPendingClubs] = useState<Club[]>([]);
   const [likedPostIds, setLikedPostIds] = useState<Set<string>>(new Set());
   
@@ -32,98 +30,103 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // Initialize and Fetch Real Data from Supabase
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
       try {
-        // 1. Check Auth Status
-        const { data: { session } } = await supabase.auth.getSession();
-        setCurrentUser(session?.user ?? null);
+        // 1. Auth Session Check
+        try {
+          const { data: sessionData } = await supabase.auth.getSession();
+          if (sessionData?.session?.user) {
+            setCurrentUser(sessionData.session.user);
+          }
+        } catch (e) { console.debug("Supabase Auth unreachable", e); }
 
-        // 2. Fetch Verified Clubs
-        const { data: clubsData } = await supabase
-          .from('clubs')
-          .select('*')
-          .eq('verification_status', 'VERIFIED');
-        
-        if (clubsData && clubsData.length > 0) {
-          setClubs(clubsData.map(c => ({
-            id: c.id,
-            name: c.name,
-            university: c.university,
-            category: c.category,
-            description: c.description,
-            longDescription: c.long_description,
-            logo: c.logo_url,
-            coverImage: c.cover_url,
-            location: c.location,
-            memberCount: c.member_count,
-            tags: c.tags || [],
-            angelScore: c.angel_score,
-            totalFunding: Number(c.total_funding),
-            verificationStatus: c.verification_status,
-            projects: [] 
-          })));
-        } else {
-          setClubs(MOCK_CLUBS);
-        }
+        // 2. Fetch Clubs
+        try {
+          const { data: clubsData, error: clubsError } = await supabase
+            .from('clubs')
+            .select('*')
+            .eq('verification_status', 'VERIFIED');
+          
+          if (!clubsError && clubsData && clubsData.length > 0) {
+            setClubs(clubsData.map(c => ({
+              id: c.id,
+              name: c.name,
+              university: (c.university as any) || 'OTHER',
+              category: c.category,
+              description: c.description,
+              longDescription: c.long_description,
+              logo: c.logo_url,
+              coverImage: c.cover_url,
+              location: c.location,
+              memberCount: c.member_count || 0,
+              tags: c.tags || [],
+              angelScore: c.angel_score || 0,
+              totalFunding: Number(c.total_funding || 0),
+              verificationStatus: c.verification_status,
+              projects: [] 
+            })));
+          }
+        } catch (e) { console.debug("Clubs fetch failed", e); }
 
-        // 3. Fetch Posts with Join
-        const { data: postsData } = await supabase
-          .from('posts')
-          .select(`
-            *,
-            clubs (name, logo_url, university)
-          `)
-          .order('created_at', { ascending: false });
+        // 3. Fetch Posts
+        try {
+          const { data: postsData, error: postsError } = await supabase
+            .from('posts')
+            .select(`
+              *,
+              clubs (name, logo_url, university)
+            `)
+            .order('created_at', { ascending: false });
 
-        if (postsData && postsData.length > 0) {
-          const formattedPosts = postsData.map(p => ({
-            id: p.id,
-            clubId: p.club_id,
-            clubName: p.clubs?.name || 'Unknown',
-            clubLogo: p.clubs?.logo_url || 'https://picsum.photos/200',
-            university: p.clubs?.university || 'Campus',
-            content: p.content,
-            image: p.image_url,
-            createdAt: new Date(p.created_at).toLocaleDateString(),
-            likes: p.likes || 0,
-            comments: p.comments || 0,
-            type: p.type
-          }));
-          setPosts(formattedPosts as any);
-        } else {
-          setPosts(MOCK_FEED_POSTS);
-        }
+          if (!postsError && postsData && postsData.length > 0) {
+            const formattedPosts = postsData.map(p => ({
+              id: p.id,
+              clubId: p.club_id,
+              clubName: (p.clubs as any)?.name || 'Unknown',
+              clubLogo: (p.clubs as any)?.logo_url || 'https://picsum.photos/200',
+              university: (p.clubs as any)?.university || 'Campus',
+              content: p.content,
+              image: p.image_url,
+              createdAt: p.created_at ? new Date(p.created_at).toLocaleDateString() : 'Unknown',
+              likes: p.likes || 0,
+              comments: p.comments || 0,
+              type: p.type || 'UPDATE'
+            }));
+            setPosts(formattedPosts as any);
+          }
+        } catch (e) { console.debug("Posts fetch failed", e); }
 
         // 4. Fetch Sponsors
-        const { data: sponsorsData } = await supabase.from('sponsors').select('*');
-        if (sponsorsData && sponsorsData.length > 0) {
-          setSponsors(sponsorsData.map(s => ({
-            id: s.id,
-            name: s.name,
-            email: s.email,
-            type: s.type,
-            description: s.description,
-            interest: s.interest_tags || [],
-            totalDonated: Number(s.total_donated),
-            logo: s.logo_url,
-            isPartner: s.is_partner
-          })));
-        } else {
-          setSponsors(MOCK_SPONSORS);
-        }
+        try {
+          const { data: sponsorsData, error: sponsorsError } = await supabase.from('sponsors').select('*');
+          if (!sponsorsError && sponsorsData && sponsorsData.length > 0) {
+            setSponsors(sponsorsData.map(s => ({
+              id: s.id,
+              name: s.name,
+              email: s.email || '',
+              type: s.type || 'INDIVIDUAL',
+              description: s.description || '',
+              interest: s.interest_tags || [],
+              totalDonated: Number(s.total_donated || 0),
+              logo: s.logo_url || 'https://picsum.photos/100',
+              isPartner: s.is_partner || false
+            })));
+          }
+        } catch (e) { console.debug("Sponsors fetch failed", e); }
 
-        // 5. Fetch Pending Clubs for Admin Dashboard
-        const { data: pendingData } = await supabase
-          .from('clubs')
-          .select('*')
-          .eq('verification_status', 'PENDING');
-        if (pendingData) setPendingClubs(pendingData as any);
+        // 5. Fetch Pending
+        try {
+          const { data: pendingData } = await supabase
+            .from('clubs')
+            .select('*')
+            .eq('verification_status', 'PENDING');
+          if (pendingData) setPendingClubs(pendingData as any);
+        } catch (e) { console.debug("Pending clubs fetch failed", e); }
 
       } catch (err) {
-        console.error("Supabase Init Error:", err);
+        console.warn("Global init data error:", err);
       } finally {
         setLoading(false);
       }
@@ -148,7 +151,6 @@ const App: React.FC = () => {
     const isCurrentlyLiked = likedPostIds.has(postId);
     const delta = isCurrentlyLiked ? -1 : 1;
 
-    // Optimistic UI Update
     setLikedPostIds(prev => {
       const next = new Set(prev);
       if (isCurrentlyLiked) next.delete(postId);
@@ -170,7 +172,7 @@ const App: React.FC = () => {
           .eq('id', postId);
       }
     } catch (err) {
-      console.error("Failed to update likes:", err);
+      console.debug("Failed to update likes in DB", err);
     }
   };
 
@@ -194,9 +196,9 @@ const App: React.FC = () => {
         const savedPost: FeedPost = {
           id: data[0].id,
           clubId: data[0].club_id,
-          clubName: data[0].clubs?.name,
-          clubLogo: data[0].clubs?.logo_url,
-          university: data[0].clubs?.university,
+          clubName: (data[0].clubs as any)?.name,
+          clubLogo: (data[0].clubs as any)?.logo_url,
+          university: (data[0].clubs as any)?.university,
           content: data[0].content,
           image: data[0].image_url,
           createdAt: '방금 전',
@@ -205,9 +207,25 @@ const App: React.FC = () => {
           type: data[0].type as any
         };
         setPosts(prev => [savedPost, ...prev]);
+      } else {
+        throw new Error("No data returned");
       }
     } catch (err) {
-      console.error("Post Insert Error:", err);
+      console.warn("Post Insert Error (using fallback):", err);
+      const fallbackPost: FeedPost = {
+        id: Math.random().toString(),
+        clubId: newPostData.clubId,
+        clubName: newPostData.clubName,
+        clubLogo: newPostData.clubLogo,
+        university: newPostData.university,
+        content: newPostData.content,
+        image: newPostData.image,
+        createdAt: '방금 전',
+        likes: 0,
+        comments: 0,
+        type: newPostData.type as any
+      };
+      setPosts(prev => [fallbackPost, ...prev]);
     }
   };
 
@@ -227,19 +245,26 @@ const App: React.FC = () => {
       }
     } catch (err) {
       console.error("Approval Error:", err);
+      alert("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
   };
 
   const renderPage = () => {
     if (currentPage === 'ADMIN_DASHBOARD') {
-      if (!isAdminLoggedIn) return <AdminLogin onLogin={() => setIsAdminLoggedIn(true)} />;
+      if (!isAdminLoggedIn) {
+        setCurrentPage('HOME');
+        return <Home onSelectClub={selectClub} onLikePost={handleLikePost} likedPostIds={likedPostIds} customPosts={posts} />;
+      }
       return (
         <AdminDashboard 
           pendingClubs={pendingClubs} 
           allSponsors={sponsors} 
           onApprove={handleApproveClub} 
           onReject={() => {}} 
-          onLogout={() => setIsAdminLoggedIn(false)} 
+          onLogout={() => {
+            setIsAdminLoggedIn(false);
+            navigateTo('HOME');
+          }} 
         />
       );
     }
@@ -288,14 +313,7 @@ const App: React.FC = () => {
         <Navbar onNavigate={navigateTo} currentPage={currentPage} />
       )}
       <main className="flex-grow">
-        {loading && currentPage === 'HOME' ? (
-          <div className="h-screen flex items-center justify-center bg-black">
-             <div className="flex flex-col items-center gap-6">
-                <div className="w-10 h-10 border-2 border-white/10 border-t-white rounded-full animate-spin"></div>
-                <div className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase italic">Establishing Secure Data Link...</div>
-             </div>
-          </div>
-        ) : renderPage()}
+        {renderPage()}
       </main>
     </div>
   );

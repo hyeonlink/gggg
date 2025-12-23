@@ -75,7 +75,8 @@ const ClubProfile: React.FC<ClubProfileProps> = ({ club, onAddPost, allPosts }) 
       {/* 커버 이미지 영역 */}
       <div className="h-[25vh] md:h-[35vh] w-full overflow-hidden relative">
         <img src={club.coverImage} className="w-full h-full object-cover opacity-30" alt="cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent"></div>
+        {/* 그라데이션 제거: bg-gradient-to-t from-[#050505] via-transparent to-transparent -> bg-black/40 */}
+        <div className="absolute inset-0 bg-black/40"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 -mt-16 relative z-10 pb-40">
