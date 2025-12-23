@@ -91,40 +91,39 @@ const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
 
     try {
       if (mode === 'SIGNUP') {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: { 
-              first_name: firstName, 
-              last_name: lastName,
-              birthday: `${birthYear}-${birthMonth}-${birthDay}`,
-              gender
-            }
-          }
         });
-        if (error) throw error;
+        
+        if (signUpError) throw signUpError;
+
+        if (signUpData.user) {
+          // Assign role in profiles table
+          const { error: profileError } = await supabase.from('profiles').insert([
+            {
+              id: signUpData.user.id,
+              email: signUpData.user.email,
+              role: 'CLUB',
+            },
+          ]);
+          if (profileError) console.error("Profile creation error:", profileError);
+        }
+
         alert('엔젤캠퍼스 가입을 축하드립니다! 로그인을 진행해주세요.');
         setMode('LOGIN');
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        if (data.user) onAuthSuccess(false);
+        
+        // Check role
+        if (data.user) {
+          const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single();
+          onAuthSuccess(profile?.role === 'ADMIN');
+        }
       }
     } catch (err: any) {
-      // Supabase 연동 전 데모 모드 (Failed to fetch 방지)
-      if (err.message.includes('fetch') || err.message.includes('Network')) {
-        if (mode === 'SIGNUP') {
-          alert('가입되었습니다! (데모 모드)');
-          setMode('LOGIN');
-        } else if (email && password) {
-          onAuthSuccess(false);
-        } else {
-          setError('네트워크 연결을 확인하거나 아이디/비밀번호를 입력하세요.');
-        }
-      } else {
-        setError(err.message || '인증 중 오류가 발생했습니다.');
-      }
+      setError(err.message || '인증 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }

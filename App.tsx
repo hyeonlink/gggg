@@ -32,7 +32,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // Initialize and Fetch Real Data
+  // Initialize and Fetch Real Data from Supabase
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
@@ -49,13 +49,21 @@ const App: React.FC = () => {
         
         if (clubsData && clubsData.length > 0) {
           setClubs(clubsData.map(c => ({
-            ...c,
+            id: c.id,
+            name: c.name,
+            university: c.university,
+            category: c.category,
+            description: c.description,
+            longDescription: c.long_description,
             logo: c.logo_url,
             coverImage: c.cover_url,
-            longDescription: c.long_description,
+            location: c.location,
             memberCount: c.member_count,
+            tags: c.tags || [],
             angelScore: c.angel_score,
-            totalFunding: Number(c.total_funding)
+            totalFunding: Number(c.total_funding),
+            verificationStatus: c.verification_status,
+            projects: [] 
           })));
         } else {
           setClubs(MOCK_CLUBS);
@@ -93,16 +101,21 @@ const App: React.FC = () => {
         const { data: sponsorsData } = await supabase.from('sponsors').select('*');
         if (sponsorsData && sponsorsData.length > 0) {
           setSponsors(sponsorsData.map(s => ({
-            ...s,
+            id: s.id,
+            name: s.name,
+            email: s.email,
+            type: s.type,
+            description: s.description,
+            interest: s.interest_tags || [],
+            totalDonated: Number(s.total_donated),
             logo: s.logo_url,
-            interest: s.interest_tags,
-            totalDonated: Number(s.total_donated)
+            isPartner: s.is_partner
           })));
         } else {
           setSponsors(MOCK_SPONSORS);
         }
 
-        // 5. Fetch Pending Clubs for Admin
+        // 5. Fetch Pending Clubs for Admin Dashboard
         const { data: pendingData } = await supabase
           .from('clubs')
           .select('*')
@@ -133,9 +146,9 @@ const App: React.FC = () => {
 
   const handleLikePost = async (postId: string) => {
     const isCurrentlyLiked = likedPostIds.has(postId);
-    const newLikes = isCurrentlyLiked ? -1 : 1;
+    const delta = isCurrentlyLiked ? -1 : 1;
 
-    // Optimistic Update
+    // Optimistic UI Update
     setLikedPostIds(prev => {
       const next = new Set(prev);
       if (isCurrentlyLiked) next.delete(postId);
@@ -144,20 +157,20 @@ const App: React.FC = () => {
     });
 
     setPosts(currentPosts => currentPosts.map(p => {
-      if (p.id === postId) return { ...p, likes: p.likes + newLikes };
+      if (p.id === postId) return { ...p, likes: Math.max(0, p.likes + delta) };
       return p;
     }));
 
     try {
-      const postToUpdate = posts.find(p => p.id === postId);
-      if (postToUpdate) {
+      const { data: postData } = await supabase.from('posts').select('likes').eq('id', postId).single();
+      if (postData) {
         await supabase
           .from('posts')
-          .update({ likes: Math.max(0, postToUpdate.likes + newLikes) })
+          .update({ likes: Math.max(0, postData.likes + delta) })
           .eq('id', postId);
       }
     } catch (err) {
-      console.error("Like update error:", err);
+      console.error("Failed to update likes:", err);
     }
   };
 
@@ -253,7 +266,7 @@ const App: React.FC = () => {
       case 'CLUBS':
         return <Clubs onSelectClub={selectClub} customClubs={clubs} />;
       case 'RANKING':
-        return <Ranking onSelectClub={selectClub} />;
+        return <Ranking onSelectClub={selectClub} customClubs={clubs} />;
       case 'SPONSORS':
         return <Sponsors customSponsors={sponsors} />;
       case 'AI_LAB':
@@ -279,7 +292,7 @@ const App: React.FC = () => {
           <div className="h-screen flex items-center justify-center bg-black">
              <div className="flex flex-col items-center gap-6">
                 <div className="w-10 h-10 border-2 border-white/10 border-t-white rounded-full animate-spin"></div>
-                <div className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase italic">Connecting to Campus Network...</div>
+                <div className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase italic">Establishing Secure Data Link...</div>
              </div>
           </div>
         ) : renderPage()}

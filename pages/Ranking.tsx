@@ -1,10 +1,14 @@
 
 import React, { useState } from 'react';
-import { MOCK_CLUBS } from '../constants';
-import { Club } from '../types';
+import { Club } from '../types.ts';
 
-const Ranking: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClub }) => {
-  const sortedClubs = [...MOCK_CLUBS].sort((a, b) => b.angelScore - a.angelScore);
+interface RankingProps {
+  onSelectClub: (id: string) => void;
+  customClubs?: Club[];
+}
+
+const Ranking: React.FC<RankingProps> = ({ onSelectClub, customClubs }) => {
+  const sortedClubs = [...(customClubs || [])].sort((a, b) => b.angelScore - a.angelScore);
   const [filter, setFilter] = useState('ALL');
 
   const filteredClubs = filter === 'ALL' 
@@ -19,7 +23,6 @@ const Ranking: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClu
           <p className="text-white/40 tracking-[0.4em] font-light uppercase text-sm">엔젤들이 선택한 이달의 TOP 캠퍼스 브랜드</p>
         </header>
 
-        {/* University Tabs */}
         <div className="flex gap-6 mb-12 border-b border-white/10 pb-4 overflow-x-auto">
           {['ALL', 'SNU', 'YONSEI', 'KOREA'].map((univ) => (
             <button
@@ -34,7 +37,6 @@ const Ranking: React.FC<{ onSelectClub: (id: string) => void }> = ({ onSelectClu
           ))}
         </div>
 
-        {/* Ranking List */}
         <div className="space-y-4">
           {filteredClubs.map((club, index) => (
             <div 

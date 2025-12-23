@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { matchSponsorsAI } from '../services/geminiService.ts';
-import { MOCK_SPONSORS } from '../constants.tsx';
+import { supabase } from '../lib/supabase.ts';
 import { Sponsor } from '../types.ts';
 
 const AIAssistant: React.FC = () => {
@@ -35,30 +34,49 @@ const AIAssistant: React.FC = () => {
     addLog(`Sender identified as: ${adminEmail}`);
     
     try {
-      addLog("Scanning database for matching profiles via Gemini 3 Flash...");
+      addLog("Fetching live sponsor profiles for grounding...");
+      addLog("Scanning database via Gemini 3 Flash analysis...");
+      
       const matchedIds = await matchSponsorsAI({
         clubName: formData.clubName,
         targetQuery: formData.targetQuery,
         messageContent: formData.messageContent
       });
 
-      const matches = MOCK_SPONSORS.filter(s => matchedIds.includes(s.id));
-      setMatchedSponsors(matches);
+      // Fetch the full sponsor details from Supabase for the matches found
+      const { data: dbSponsors } = await supabase
+        .from('sponsors')
+        .select('*')
+        .in('id', matchedIds);
 
-      if (matches.length > 0) {
-        addLog(`Found ${matches.length} optimized targets: ${matches.map(m => m.name).join(', ')}`);
-        for (const sponsor of matches) {
+      const formattedMatches: Sponsor[] = (dbSponsors || []).map(s => ({
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        type: s.type,
+        description: s.description,
+        interest: s.interest_tags || [],
+        totalDonated: Number(s.total_donated),
+        logo: s.logo_url,
+        isPartner: s.is_partner
+      }));
+
+      setMatchedSponsors(formattedMatches);
+
+      if (formattedMatches.length > 0) {
+        addLog(`Found ${formattedMatches.length} optimized targets: ${formattedMatches.map(m => m.name).join(', ')}`);
+        for (const sponsor of formattedMatches) {
           addLog(`Dispatching automated email to: ${sponsor.email}...`);
           await new Promise(resolve => setTimeout(resolve, 800));
           addLog(`SUCCESS: Message delivered to ${sponsor.name}.`);
         }
         setStep('SENT');
       } else {
-        addLog("No direct matches found. Refine your target query.");
+        addLog("No direct matches found. Try refining your targeting keywords.");
         setStep('IDLE');
       }
     } catch (error) {
-      addLog(`FATAL ERROR: ${error instanceof Error ? error.message : 'Unknown failure'}`);
+      addLog(`FATAL ERROR: ${error instanceof Error ? error.message : 'System Failure'}`);
     } finally {
       setLoading(false);
     }

@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase.ts";
 
 /**
  * [AI Data Grounding]
- * DB에서 최신 후원자 정보를 가져와 Gemini에게 전달함으로써 정밀한 매칭을 수행합니다.
+ * Fetches real sponsor data from Supabase and passes it to Gemini 3 Flash.
  */
 export const matchSponsorsAI = async (params: {
   targetQuery: string;
@@ -14,7 +14,7 @@ export const matchSponsorsAI = async (params: {
   const { targetQuery, messageContent, clubName } = params;
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  // 1. Fetch live data from Supabase
+  // 1. Fetch live sponsor data from Supabase
   const { data: sponsorsData } = await supabase
     .from('sponsors')
     .select('id, name, email, description, interest_tags, type');
@@ -33,7 +33,7 @@ export const matchSponsorsAI = async (params: {
 
   const prompt = `
     [발신 동아리]: ${clubName}
-    [타겟팅 조건]: "${targetQuery}"
+    [타겟팅 요구사항]: "${targetQuery}"
     [이메일 본문]: "${messageContent.substring(0, 500)}"
     
     [후원자 데이터베이스]: ${JSON.stringify(sponsorsData)}
@@ -62,7 +62,7 @@ export const matchSponsorsAI = async (params: {
 };
 
 /**
- * 사용자 쿼리에 기반하여 동아리를 검색합니다.
+ * Searches for clubs based on context using Gemini analysis.
  */
 export const searchClubsAI = async (query: string, clubsData: any[]) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });

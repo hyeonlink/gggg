@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase.ts';
 
@@ -28,27 +27,39 @@ const ClubRegistration: React.FC<ClubRegistrationProps> = ({ onRegister }) => {
     e.preventDefault();
     setLoading(true);
 
-    const newClub = {
-      ...formData,
-      id: Math.random().toString(36).substr(2, 9),
-      memberCount: 1,
-      tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
-      projects: [],
-      angelScore: 100,
-      totalFunding: 0,
-      verificationStatus: 'PENDING'
-    };
-
     try {
-      const { error } = await supabase
-        .from('pending_clubs')
-        .insert([newClub]);
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const newClubEntry = {
+        owner_id: user?.id || null, // Links to profile if logged in
+        name: formData.name,
+        university: formData.university,
+        category: formData.category,
+        description: formData.description,
+        long_description: formData.longDescription,
+        logo_url: formData.logo,
+        cover_url: formData.coverImage,
+        location: formData.location,
+        tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
+        member_count: 1,
+        angel_score: 100,
+        total_funding: 0,
+        verification_status: 'PENDING'
+      };
+
+      const { data, error } = await supabase
+        .from('clubs')
+        .insert([newClubEntry])
+        .select()
+        .single();
       
       if (error) throw error;
-      onRegister(newClub);
+      
+      alert('동아리 등록 신청이 완료되었습니다. 관리자 승인 대기 중입니다.');
+      onRegister(data);
     } catch (err: any) {
-      console.error("Registration Error:", err);
-      onRegister(newClub);
+      console.error("Supabase Club Registration Error:", err);
+      alert('등록 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }
@@ -115,7 +126,7 @@ const ClubRegistration: React.FC<ClubRegistrationProps> = ({ onRegister }) => {
             </div>
           </section>
 
-          {/* Section 2: Storytelling - AI Help Removed */}
+          {/* Section 2: Storytelling */}
           <section className="space-y-10">
             <h2 className="text-xl font-black tracking-widest uppercase border-b border-white/10 pb-4 flex items-center gap-4">
               <span className="text-blue-600">02</span> 동아리 스토리텔링
