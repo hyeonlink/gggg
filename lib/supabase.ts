@@ -1,16 +1,19 @@
 
 /**
- * [Supabase SQL Schema - Run this in your SQL Editor]
+ * [Supabase SQL Editor - 아래 쿼리를 실행하여 테이블을 생성하세요]
  * 
- * -- 1. Profiles Table (Linked to Auth)
+ * -- 1. 유저 역할 타입 생성
+ * CREATE TYPE user_role AS ENUM ('CLUB', 'ANGEL', 'ADMIN');
+ * 
+ * -- 2. 프로필 테이블 (Auth 연동)
  * CREATE TABLE profiles (
  *   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
  *   email TEXT UNIQUE NOT NULL,
- *   role TEXT DEFAULT 'CLUB' CHECK (role IN ('CLUB', 'ANGEL', 'ADMIN')),
+ *   role user_role DEFAULT 'CLUB',
  *   created_at TIMESTAMPTZ DEFAULT NOW()
  * );
  * 
- * -- 2. Clubs Table
+ * -- 3. 동아리 테이블
  * CREATE TABLE clubs (
  *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
  *   owner_id UUID REFERENCES profiles(id),
@@ -30,7 +33,7 @@
  *   created_at TIMESTAMPTZ DEFAULT NOW()
  * );
  * 
- * -- 3. Posts Table
+ * -- 4. 포스트 테이블
  * CREATE TABLE posts (
  *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
  *   club_id UUID REFERENCES clubs(id) ON DELETE CASCADE,
@@ -42,7 +45,7 @@
  *   created_at TIMESTAMPTZ DEFAULT NOW()
  * );
  * 
- * -- 4. Sponsors Table
+ * -- 5. 후원자 테이블
  * CREATE TABLE sponsors (
  *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
  *   name TEXT NOT NULL,
@@ -63,3 +66,10 @@ const supabaseUrl = (process.env as any).SUPABASE_URL || 'https://your-project.s
 const supabaseAnonKey = (process.env as any).SUPABASE_ANON_KEY || 'your-anon-key';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export type Tables = {
+  clubs: any;
+  posts: any;
+  sponsors: any;
+  profiles: any;
+};

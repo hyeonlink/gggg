@@ -4,7 +4,7 @@ import { supabase } from "../lib/supabase.ts";
 
 /**
  * [AI Data Grounding]
- * Supabase DB에서 최신 후원자 데이터를 가져와 Gemini에게 전달합니다.
+ * DB에서 최신 후원자 정보를 가져와 Gemini에게 전달함으로써 정밀한 매칭을 수행합니다.
  */
 export const matchSponsorsAI = async (params: {
   targetQuery: string;
@@ -14,32 +14,31 @@ export const matchSponsorsAI = async (params: {
   const { targetQuery, messageContent, clubName } = params;
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  // 1. Fetch Real Sponsors from Supabase instead of relying on passed params
+  // 1. Fetch live data from Supabase
   const { data: sponsorsData } = await supabase
     .from('sponsors')
     .select('id, name, email, description, interest_tags, type');
 
   if (!sponsorsData || sponsorsData.length === 0) return [];
 
-  const systemInstruction = `당신은 '엔젤캠퍼스'의 지능형 이메일 아웃리치 매칭 엔진입니다. 
-  사용자의 요구사항(targetQuery)과 실제 발송될 이메일 본문(messageContent)을 분석하여, 
-  가장 높은 응답률을 보일 최적의 엔젤(후원자)을 데이터베이스에서 선별하는 것이 임무입니다.
+  const systemInstruction = `당신은 '엔젤캠퍼스'의 지능형 매칭 엔진입니다. 
+  동아리의 타겟팅 요구사항(targetQuery)과 이메일 본문(messageContent)을 분석하여, 
+  DB에서 가장 적합한 후원자를 선별하세요.
   
   선별 기준:
-  1. targetQuery에 기술된 페르소나와 후원자의 프로필 유사도.
-  2. messageContent 프로젝트와 후원자 전문 분야 일치도.
-  3. 후원자 유형과 요청 규모 적합성.
+  1. targetQuery에 기술된 관심사와 후원자의 interest_tags 일치도.
+  2. 이메일 본문의 목적과 후원자의 전문 분야(description) 유사성.
   
-  반드시 제공된 데이터베이스의 ID만 사용하세요.`;
+  반드시 제공된 데이터베이스의 ID만 반환하세요.`;
 
   const prompt = `
     [발신 동아리]: ${clubName}
-    [검색 타겟 쿼리]: "${targetQuery}"
-    [발송될 이메일 본문]: "${messageContent.substring(0, 800)}"
+    [타겟팅 조건]: "${targetQuery}"
+    [이메일 본문]: "${messageContent.substring(0, 500)}"
     
     [후원자 데이터베이스]: ${JSON.stringify(sponsorsData)}
     
-    위 데이터베이스에서 가장 부합하는 후원자 ID를 최대 3명까지 엄선하여 JSON 배열 ["id1", "id2"] 형식으로만 응답하세요.
+    위 데이터베이스에서 가장 부합하는 후원자 ID를 최대 3명까지 JSON 배열 ["id1", "id2"] 형식으로만 응답하세요.
   `;
 
   try {
@@ -62,6 +61,9 @@ export const matchSponsorsAI = async (params: {
   }
 };
 
+/**
+ * 사용자 쿼리에 기반하여 동아리를 검색합니다.
+ */
 export const searchClubsAI = async (query: string, clubsData: any[]) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const prompt = `

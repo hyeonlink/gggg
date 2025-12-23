@@ -21,7 +21,7 @@ const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('HOME');
   const [selectedClubId, setSelectedClubId] = useState<string | null>(null);
   
-  // States
+  // Data States
   const [clubs, setClubs] = useState<Club[]>([]);
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
@@ -32,34 +32,36 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // 1. Data Initialization from Supabase
+  // Initialize and Fetch Real Data
   useEffect(() => {
     const initData = async () => {
       setLoading(true);
       try {
-        // Fetch User Session
+        // 1. Check Auth Status
         const { data: { session } } = await supabase.auth.getSession();
         setCurrentUser(session?.user ?? null);
 
-        // Fetch Verified Clubs
+        // 2. Fetch Verified Clubs
         const { data: clubsData } = await supabase
           .from('clubs')
           .select('*')
           .eq('verification_status', 'VERIFIED');
-        if (clubsData) setClubs(clubsData.map(c => ({
-          ...c,
-          logo: c.logo_url || c.logo,
-          coverImage: c.cover_url || c.coverImage
-        })));
+        
+        if (clubsData && clubsData.length > 0) {
+          setClubs(clubsData.map(c => ({
+            ...c,
+            logo: c.logo_url,
+            coverImage: c.cover_url,
+            longDescription: c.long_description,
+            memberCount: c.member_count,
+            angelScore: c.angel_score,
+            totalFunding: Number(c.total_funding)
+          })));
+        } else {
+          setClubs(MOCK_CLUBS);
+        }
 
-        // Fetch Pending Clubs (for admin)
-        const { data: pendingData } = await supabase
-          .from('clubs')
-          .select('*')
-          .eq('verification_status', 'PENDING');
-        if (pendingData) setPendingClubs(pendingData);
-
-        // Fetch Posts with Club Info
+        // 3. Fetch Posts with Join
         const { data: postsData } = await supabase
           .from('posts')
           .select(`
@@ -68,13 +70,13 @@ const App: React.FC = () => {
           `)
           .order('created_at', { ascending: false });
 
-        if (postsData) {
+        if (postsData && postsData.length > 0) {
           const formattedPosts = postsData.map(p => ({
             id: p.id,
             clubId: p.club_id,
             clubName: p.clubs?.name || 'Unknown',
             clubLogo: p.clubs?.logo_url || 'https://picsum.photos/200',
-            university: p.clubs?.university || 'Unknown',
+            university: p.clubs?.university || 'Campus',
             content: p.content,
             image: p.image_url,
             createdAt: new Date(p.created_at).toLocaleDateString(),
@@ -83,12 +85,29 @@ const App: React.FC = () => {
             type: p.type
           }));
           setPosts(formattedPosts as any);
+        } else {
+          setPosts(MOCK_FEED_POSTS);
         }
 
-        // Fetch Sponsors for AI context
+        // 4. Fetch Sponsors
         const { data: sponsorsData } = await supabase.from('sponsors').select('*');
-        if (sponsorsData) setSponsors(sponsorsData);
-        else setSponsors(MOCK_SPONSORS); // Fallback
+        if (sponsorsData && sponsorsData.length > 0) {
+          setSponsors(sponsorsData.map(s => ({
+            ...s,
+            logo: s.logo_url,
+            interest: s.interest_tags,
+            totalDonated: Number(s.total_donated)
+          })));
+        } else {
+          setSponsors(MOCK_SPONSORS);
+        }
+
+        // 5. Fetch Pending Clubs for Admin
+        const { data: pendingData } = await supabase
+          .from('clubs')
+          .select('*')
+          .eq('verification_status', 'PENDING');
+        if (pendingData) setPendingClubs(pendingData as any);
 
       } catch (err) {
         console.error("Supabase Init Error:", err);
@@ -124,8 +143,12 @@ const App: React.FC = () => {
       return next;
     });
 
+    setPosts(currentPosts => currentPosts.map(p => {
+      if (p.id === postId) return { ...p, likes: p.likes + newLikes };
+      return p;
+    }));
+
     try {
-      // In a real app, use an RPC or transaction for thread-safe increment
       const postToUpdate = posts.find(p => p.id === postId);
       if (postToUpdate) {
         await supabase
@@ -140,20 +163,17 @@ const App: React.FC = () => {
 
   const handleAddPost = async (newPostData: Omit<FeedPost, 'id' | 'createdAt' | 'likes' | 'comments'>) => {
     try {
-      const { data, error } = await supabase
-        .from('posts')
-        .insert([{
-          club_id: newPostData.clubId,
-          content: newPostData.content,
-          image_url: newPostData.image,
-          type: newPostData.type,
-          likes: 0,
-          comments: 0
-        }])
-        .select(`
-          *,
-          clubs (name, logo_url, university)
-        `);
+      const { data, error } = await supabase.from('posts').insert([{
+        club_id: newPostData.clubId,
+        content: newPostData.content,
+        image_url: newPostData.image,
+        type: newPostData.type,
+        likes: 0,
+        comments: 0
+      }]).select(`
+        *,
+        clubs (name, logo_url, university)
+      `);
       
       if (error) throw error;
 
@@ -169,12 +189,12 @@ const App: React.FC = () => {
           createdAt: '방금 전',
           likes: 0,
           comments: 0,
-          type: data[0].type
+          type: data[0].type as any
         };
         setPosts(prev => [savedPost, ...prev]);
       }
     } catch (err) {
-      console.error("Post Sync Error:", err);
+      console.error("Post Insert Error:", err);
     }
   };
 
@@ -187,7 +207,6 @@ const App: React.FC = () => {
       
       if (error) throw error;
       
-      // Update local state
       const approved = pendingClubs.find(c => c.id === clubId);
       if (approved) {
         setClubs(prev => [...prev, { ...approved, verificationStatus: 'VERIFIED' } as any]);
@@ -260,7 +279,7 @@ const App: React.FC = () => {
           <div className="h-screen flex items-center justify-center bg-black">
              <div className="flex flex-col items-center gap-6">
                 <div className="w-10 h-10 border-2 border-white/10 border-t-white rounded-full animate-spin"></div>
-                <div className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase">Establishing Secure Connection...</div>
+                <div className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase italic">Connecting to Campus Network...</div>
              </div>
           </div>
         ) : renderPage()}

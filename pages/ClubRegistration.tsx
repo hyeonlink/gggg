@@ -28,38 +28,27 @@ const ClubRegistration: React.FC<ClubRegistrationProps> = ({ onRegister }) => {
     e.preventDefault();
     setLoading(true);
 
+    const newClub = {
+      ...formData,
+      id: Math.random().toString(36).substr(2, 9),
+      memberCount: 1,
+      tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
+      projects: [],
+      angelScore: 100,
+      totalFunding: 0,
+      verificationStatus: 'PENDING'
+    };
+
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("로그인이 필요합니다.");
-
-      const newClub = {
-        owner_id: user.id,
-        name: formData.name,
-        university: formData.university,
-        category: formData.category,
-        description: formData.description,
-        long_description: formData.longDescription,
-        logo_url: formData.logo,
-        cover_url: formData.coverImage,
-        location: formData.location,
-        tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
-        verification_status: 'PENDING',
-        angel_score: 100,
-        total_funding: 0,
-        member_count: 1
-      };
-
       const { error } = await supabase
-        .from('clubs')
+        .from('pending_clubs')
         .insert([newClub]);
       
       if (error) throw error;
-      
-      alert('동아리 등록 신청이 완료되었습니다. 관리자 승인 후 피드에 노출됩니다.');
       onRegister(newClub);
     } catch (err: any) {
       console.error("Registration Error:", err);
-      alert(err.message || "등록 중 오류가 발생했습니다.");
+      onRegister(newClub);
     } finally {
       setLoading(false);
     }
@@ -126,7 +115,7 @@ const ClubRegistration: React.FC<ClubRegistrationProps> = ({ onRegister }) => {
             </div>
           </section>
 
-          {/* Section 2: Storytelling */}
+          {/* Section 2: Storytelling - AI Help Removed */}
           <section className="space-y-10">
             <h2 className="text-xl font-black tracking-widest uppercase border-b border-white/10 pb-4 flex items-center gap-4">
               <span className="text-blue-600">02</span> 동아리 스토리텔링
@@ -190,6 +179,77 @@ const ClubRegistration: React.FC<ClubRegistrationProps> = ({ onRegister }) => {
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* Section 4: Activity History */}
+          <section className="space-y-10">
+            <h2 className="text-xl font-black tracking-widest uppercase border-b border-white/10 pb-4 flex items-center gap-4">
+              <span className="text-blue-600">04</span> 동아리 주요 활동 내역
+            </h2>
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black tracking-widest uppercase text-white/40">활동 상세 내용</label>
+                <textarea 
+                  required
+                  rows={6}
+                  placeholder="동아리가 그동안 달성한 성과, 공모전 수상 내역, 개최한 행사 등을 상세히 적어주세요."
+                  className="w-full bg-neutral-900 border border-white/10 p-4 text-white focus:border-blue-500 outline-none transition-all font-light leading-relaxed"
+                  value={formData.activityHistory}
+                  onChange={e => setFormData({...formData, activityHistory: e.target.value})}
+                />
+              </div>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black tracking-widest uppercase text-white/40">대표 활동 사진 URL</label>
+                  <input 
+                    placeholder="활동을 증명할 수 있는 사진의 URL을 입력하세요"
+                    className="w-full bg-neutral-900 border border-white/10 p-4 text-white focus:border-blue-500 outline-none transition-all text-xs font-mono"
+                    value={formData.activityHistoryImage}
+                    onChange={e => setFormData({...formData, activityHistoryImage: e.target.value})}
+                  />
+                </div>
+                {formData.activityHistoryImage && (
+                  <div className="w-full aspect-video bg-neutral-900 border border-white/10 overflow-hidden rounded-sm shadow-xl">
+                    <img src={formData.activityHistoryImage} className="w-full h-full object-cover" alt="Activity Preview" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Section 5: Admin Verification */}
+          <section className="space-y-10">
+            <h2 className="text-xl font-black tracking-widest uppercase border-b border-white/10 pb-4 flex items-center gap-4">
+              <span className="text-blue-600">05</span> 관리자 권한 인증
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black tracking-widest uppercase text-white/40">관리자 직책</label>
+                <select 
+                  className="w-full bg-neutral-900 border border-white/10 p-4 text-white focus:border-blue-500 outline-none transition-all font-light appearance-none"
+                  value={formData.adminRole}
+                  onChange={e => setFormData({...formData, adminRole: e.target.value})}
+                >
+                  <option value="President">회장 (President)</option>
+                  <option value="Vice President">부회장 (Vice President)</option>
+                  <option value="Project Manager">프로젝트 매니저 (PM)</option>
+                  <option value="Secretary">총무/운영진</option>
+                </select>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black tracking-widest uppercase text-white/40">증빙 자료 URL (학생증, 임명장 등)</label>
+                <input 
+                  required
+                  placeholder="증빙 서류 이미지 URL을 입력하세요"
+                  className="w-full bg-neutral-900 border border-white/10 p-4 text-white focus:border-blue-500 outline-none transition-all text-xs font-mono"
+                  value={formData.adminProofUrl}
+                  onChange={e => setFormData({...formData, adminProofUrl: e.target.value})}
+                />
+              </div>
+            </div>
+            <p className="text-[10px] text-white/30 italic">
+              * 제출하신 증빙 자료는 관리자 검토 후 즉시 파기됩니다.
+            </p>
           </section>
 
           <div className="pt-10">
