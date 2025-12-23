@@ -1,16 +1,65 @@
 
+/**
+ * [Supabase SQL Schema - Run this in your SQL Editor]
+ * 
+ * -- 1. Profiles Table (Linked to Auth)
+ * CREATE TABLE profiles (
+ *   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+ *   email TEXT UNIQUE NOT NULL,
+ *   role TEXT DEFAULT 'CLUB' CHECK (role IN ('CLUB', 'ANGEL', 'ADMIN')),
+ *   created_at TIMESTAMPTZ DEFAULT NOW()
+ * );
+ * 
+ * -- 2. Clubs Table
+ * CREATE TABLE clubs (
+ *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+ *   owner_id UUID REFERENCES profiles(id),
+ *   name TEXT NOT NULL,
+ *   university TEXT NOT NULL,
+ *   category TEXT NOT NULL,
+ *   description TEXT,
+ *   long_description TEXT,
+ *   logo_url TEXT,
+ *   cover_url TEXT,
+ *   location TEXT,
+ *   member_count INT DEFAULT 1,
+ *   tags TEXT[],
+ *   angel_score INT DEFAULT 100,
+ *   total_funding BIGINT DEFAULT 0,
+ *   verification_status TEXT DEFAULT 'PENDING' CHECK (verification_status IN ('PENDING', 'VERIFIED', 'REJECTED')),
+ *   created_at TIMESTAMPTZ DEFAULT NOW()
+ * );
+ * 
+ * -- 3. Posts Table
+ * CREATE TABLE posts (
+ *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+ *   club_id UUID REFERENCES clubs(id) ON DELETE CASCADE,
+ *   content TEXT NOT NULL,
+ *   image_url TEXT,
+ *   likes INT DEFAULT 0,
+ *   comments INT DEFAULT 0,
+ *   type TEXT DEFAULT 'UPDATE',
+ *   created_at TIMESTAMPTZ DEFAULT NOW()
+ * );
+ * 
+ * -- 4. Sponsors Table
+ * CREATE TABLE sponsors (
+ *   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+ *   name TEXT NOT NULL,
+ *   email TEXT,
+ *   type TEXT CHECK (type IN ('INDIVIDUAL', 'CORPORATE')),
+ *   description TEXT,
+ *   interest_tags TEXT[],
+ *   total_donated BIGINT DEFAULT 0,
+ *   logo_url TEXT,
+ *   is_partner BOOLEAN DEFAULT FALSE,
+ *   created_at TIMESTAMPTZ DEFAULT NOW()
+ * );
+ */
+
 import { createClient } from '@supabase/supabase-js';
 
-// Assume environment variables are provided by the hosting environment
 const supabaseUrl = (process.env as any).SUPABASE_URL || 'https://your-project.supabase.co';
 const supabaseAnonKey = (process.env as any).SUPABASE_ANON_KEY || 'your-anon-key';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Types for our Supabase tables
-export type Tables = {
-  clubs: any;
-  pending_clubs: any;
-  sponsors: any;
-  users_profile: any;
-};
